@@ -28,7 +28,7 @@ type KubeVirtInterfaceConfig struct {
 	Mtu                  int
 	UseDhcp              bool
 	PrimaryIntf          bool
-	AssociatedIPPool     string
+	AssociatedIPV4Pool   string
 	IPPoolNamespaceName  string
 	AssociatedIP6Pool    string
 	IP6PoolNamespaceName string
@@ -96,7 +96,7 @@ func updateInterfaceInfoFromIPAddressFromClaim(
 	if err != nil {
 		return false, err
 	}
-	if ip != nil && ip.Spec.Address == "" {
+	if ip.Spec.Address == "" {
 		logger.Info("ipClaim object has no associated IP address", "ip-claim", ipClaimName)
 		return true, errors.Errorf("ipClaim %s: no ip address associated!", ipClaimName)
 	}
@@ -320,7 +320,7 @@ func getInterfacesInfo(
 		// configured. If not, the VM will be unreachable after boot-up
 		intf.primaryIntf = intfCfg.PrimaryIntf
 
-		if intfCfg.AssociatedIPPool != "" {
+		if intfCfg.AssociatedIPV4Pool != "" {
 			shouldRetry, err := updateInterfaceInfoFromIPAddressFromClaim(
 				ctx,
 				logger,
@@ -444,7 +444,7 @@ func buildKernelArgsGrubConfig(kernelArgs string) string {
 
 func CreateOrUpdateKernelArgsSecretNormal(
 	ctx context.Context,
-	fabricClient client.Client,
+	infraClusterClient client.Client,
 	machineName, targetNamespace, clusterName string,
 	logger logr.Logger,
 	templateKernelArgs *string,
@@ -462,7 +462,8 @@ func CreateOrUpdateKernelArgsSecretNormal(
 			return nil
 		}
 
-		netConfigKernelArg, err := getNetConfigKernelArg(ctx, fabricClient, machineName, logger, networkConfigSecret, ipClaimList)
+		// TOGO gujames POC if network data can use the cloudinit data source construct in kubevirt api
+		netConfigKernelArg, err := getNetConfigKernelArg(ctx, infraClusterClient, machineName, logger, networkConfigSecret, ipClaimList)
 		if err != nil {
 			return errors.Wrap(err, "failed to create netconfig kernel argument")
 		}
@@ -490,7 +491,7 @@ func CreateOrUpdateKernelArgsSecretNormal(
 		return nil
 	}
 
-	result, err := controllerutil.CreateOrUpdate(ctx, fabricClient, kernelArgsSecret, mutateFn)
+	result, err := controllerutil.CreateOrUpdate(ctx, infraClusterClient, kernelArgsSecret, mutateFn)
 	if err != nil {
 		return kernelArgsSecret, err
 	}
@@ -588,7 +589,7 @@ func MapIntfNameToIntfConfig(interfaces []kubevirtv1.Interface) (*map[string]Kub
 		intfName2Info[intf.Name] = KubeVirtInterfaceConfig{
 			ID:                   i,
 			Intf:                 intf,
-			AssociatedIPPool:     v4Pool,
+			AssociatedIPV4Pool:   v4Pool,
 			IPPoolNamespaceName:  v4NameSpace,
 			AssociatedIP6Pool:    v6Pool,
 			IP6PoolNamespaceName: v6NameSpace,
@@ -623,12 +624,12 @@ func MapIntfNameToIntfConfig(interfaces []kubevirtv1.Interface) (*map[string]Kub
 
 func CreateOrUpdateNetworkConfigSecret(
 	ctx context.Context,
-	fabricClient client.Client,
-	machineName, targetNamespace, clusterName string,
+	infraCluserClient client.Client,
+	machineName, infraClusterNamespace, clusterName string,
 	logger logr.Logger,
 	interfaces []kubevirtv1.Interface,
 ) (*corev1.Secret, error) {
-	secret, err := getNetworkConfigSecret(ctx, fabricClient, machineName, targetNamespace)
+	secret, err := getNetworkConfigSecret(ctx, infraCluserClient, machineName, infraClusterNamespace)
 	if err != nil {
 		if !apierrors.IsNotFound(err) {
 			return nil, err
@@ -640,7 +641,7 @@ func CreateOrUpdateNetworkConfigSecret(
 	secret = &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      CreateNetworkConfigSecretName(machineName),
-			Namespace: targetNamespace,
+			Namespace: infraClusterNamespace,
 		},
 	}
 
@@ -684,7 +685,7 @@ func CreateOrUpdateNetworkConfigSecret(
 		return nil
 	}
 
-	result, err := controllerutil.CreateOrUpdate(ctx, fabricClient, secret, mutateFn)
+	result, err := controllerutil.CreateOrUpdate(ctx, infraCluserClient, secret, mutateFn)
 	if err != nil {
 		return nil, err
 	}

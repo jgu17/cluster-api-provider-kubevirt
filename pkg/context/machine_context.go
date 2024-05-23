@@ -39,7 +39,7 @@ type MachineContext struct {
 	KubevirtCluster     *infrav1.KubevirtCluster
 	KubevirtMachine     *infrav1.KubevirtMachine
 	BootstrapDataSecret *corev1.Secret
-	Logger              logr.Logger
+	logr.Logger
 }
 
 // ClusterContext returns cluster context from this machine context

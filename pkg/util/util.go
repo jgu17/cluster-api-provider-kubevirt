@@ -3,7 +3,6 @@ package util
 import (
 	"bytes"
 	"compress/gzip"
-	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
@@ -16,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 	"k8s.io/client-go/rest"
 	capkbv1 "sigs.k8s.io/cluster-api-provider-kubevirt/api/v1alpha1"
+	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -33,7 +33,7 @@ const (
 )
 
 // GetKubeVirtMachinesInCluster gets a cluster's KubeVirtMachines resources.
-func GetKubeVirtMachinesInCluster(ctx context.Context, controllerClient client.Client, namespace, clusterName string) ([]*capkbv1.KubevirtMachine, error) {
+func GetKubeVirtMachinesInCluster(ctx context.MachineContext, controllerClient client.Client, namespace, clusterName string) ([]*capkbv1.KubevirtMachine, error) {
 	labels := map[string]string{clusterv1.ClusterNameLabel: clusterName}
 	machineList := &capkbv1.KubevirtMachineList{}
 

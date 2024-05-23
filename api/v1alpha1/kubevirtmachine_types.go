@@ -39,7 +39,6 @@ type VirtualMachineTemplateSpec struct {
 	Spec kubevirtv1.VirtualMachineSpec `json:"spec,omitempty" valid:"required"`
 	// Additional arguments to be passed to the kernel at boot time
 	// +optional
-	// TODO gujames move into kubevirt vm spec
 	KernelArgs *string `json:"kernelArgs,omitempty"`
 }
 
