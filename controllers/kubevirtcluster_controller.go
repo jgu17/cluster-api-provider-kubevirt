@@ -19,8 +19,9 @@ package controllers
 import (
 	gocontext "context"
 	"fmt"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"time"
+
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
@@ -175,7 +176,7 @@ func (r *KubevirtClusterReconciler) reconcileNormal(ctx *context.ClusterContext,
 			Port: ctx.KubevirtCluster.Spec.ControlPlaneEndpoint.Port,
 		}
 		// Get LoadBalancer ExternalIP if cluster Service Type is LoadBalancer
-	} else if ctx.KubevirtCluster.Spec.ControlPlaneServiceTemplate.Spec.Type == "LoadBalancer" {
+	} else if ctx.KubevirtCluster.Spec.ControlPlaneServiceTemplate.Spec.Type == corev1.ServiceTypeLoadBalancer {
 		lbip4, err := externalLoadBalancer.ExternalIP(ctx)
 		if err != nil {
 			conditions.MarkFalse(ctx.KubevirtCluster, infrav1.LoadBalancerAvailableCondition, infrav1.LoadBalancerProvisioningFailedReason, clusterv1.ConditionSeverityWarning, err.Error())

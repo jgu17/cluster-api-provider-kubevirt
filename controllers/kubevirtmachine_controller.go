@@ -279,8 +279,23 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to reconcile kernel args secret")
 	}
 
+	var serviceAccountSecret *corev1.Secret = nil
+	// currently optional until it is enabled for the kva mgmt cluster as well
+	if ctx.KubevirtCluster.Spec.ServiceAccountName != "" {
+		serviceAccountSecret, err = r.getClusterServiceAccountTokenSecret(ctx, infraClusterClient, infraClusterNamespace)
+		if err != nil {
+			ctx.Logger.Error(err, "Failed to retrieve service account token secret")
+			return reconcile.Result{}, err
+		}
+		if serviceAccountSecret == nil {
+			ctx.Logger.Info("Service account secret not yet available")
+			// TODO listen on changes to secrets instead: https://dev.azure.com/mariner-org/ECF/_workitems/edit/3966
+			return reconcile.Result{RequeueAfter: time.Second * 5}, nil
+		}
+	}
+
 	// Create a helper for managing the KubeVirt VM hosting the machine.
-	externalMachine, err := r.MachineFactory.NewMachine(ctx, infraClusterClient, vmNamespace, clusterNodeSshKeys)
+	externalMachine, err := r.MachineFactory.NewMachine(ctx, infraClusterClient, vmNamespace, clusterNodeSshKeys, serviceAccountSecret)
 	if err != nil {
 		return ctrl.Result{}, errors.Wrapf(err, "failed to create helper for managing the externalMachine")
 	}
@@ -480,7 +495,7 @@ func (r *KubevirtMachineReconciler) reconcileDelete(ctx *context.MachineContext)
 	}
 
 	ctx.Info("Deleting VM...")
-	externalMachine, err := kubevirthandler.NewMachine(ctx, infraClusterClient, vmNamespace, nil)
+	externalMachine, err := kubevirthandler.NewMachine(ctx, infraClusterClient, vmNamespace, nil, nil)
 	if err != nil {
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to create helper for externalMachine access")
 	}
@@ -1124,4 +1139,40 @@ func hasAssociatedIPClaims(ctx *context.MachineContext, intfName2Info *map[strin
 	}
 
 	return false, nil
+}
+
+func (r *KubevirtMachineReconciler) getClusterServiceAccountTokenSecret(ctx *context.MachineContext, infraClusterClient client.Client, namespace string) (*corev1.Secret, error) {
+	serviceAccount := &corev1.ServiceAccount{}
+
+	key := client.ObjectKey{
+		Name:      ctx.KubevirtCluster.Spec.ServiceAccountName,
+		Namespace: namespace,
+	}
+	err := infraClusterClient.Get(ctx.Context, key, serviceAccount)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+	if len(serviceAccount.Secrets) == 0 {
+		ctx.Info("cluster serviceaccount secret not yet available")
+		return nil, nil
+	}
+
+	key = client.ObjectKey{
+		Name:      serviceAccount.Secrets[0].Name,
+		Namespace: serviceAccount.Namespace,
+	}
+	serviceAccountSecret := &corev1.Secret{}
+	err = infraClusterClient.Get(ctx, key, serviceAccountSecret)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return serviceAccountSecret, nil
 }

@@ -6,22 +6,11 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	"math/big"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
-	"k8s.io/client-go/rest"
-	capkbv1 "sigs.k8s.io/cluster-api-provider-kubevirt/api/v1alpha1"
-	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
-	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-)
-
-const (
-	charSet = "abcdefghijklmnopqrstuvwxyz0123456789"
 )
 
 // Enum to indicate IP protocol types
@@ -31,84 +20,6 @@ const (
 	IP4 IPProtocolType = iota
 	IP6
 )
-
-// GetKubeVirtMachinesInCluster gets a cluster's KubeVirtMachines resources.
-func GetKubeVirtMachinesInCluster(ctx context.MachineContext, controllerClient client.Client, namespace, clusterName string) ([]*capkbv1.KubevirtMachine, error) {
-	labels := map[string]string{clusterv1.ClusterNameLabel: clusterName}
-	machineList := &capkbv1.KubevirtMachineList{}
-
-	if err := controllerClient.List(
-		ctx, machineList,
-		client.InNamespace(namespace),
-		client.MatchingLabels(labels)); err != nil {
-		return nil, err
-	}
-
-	machines := make([]*capkbv1.KubevirtMachine, len(machineList.Items))
-	for i := range machineList.Items {
-		machines[i] = &machineList.Items[i]
-	}
-
-	return machines, nil
-}
-
-// RandomAlphaNumericString returns a random alphanumeric string.
-func RandomAlphaNumericString(n int) string {
-	result := make([]byte, n)
-	limit := big.NewInt(int64(len(charSet)))
-	for i := range result {
-		idx, _ := rand.Int(rand.Reader, limit)
-		result[i] = charSet[int(idx.Int64())]
-	}
-	return string(result)
-}
-
-// adopted from client-go InClusterConfig
-func serviceAccountClusterConfig(serviceAccountToken, controlEndpoint string, caData []byte) (*rest.Config, error) {
-	tlsClientConfig := rest.TLSClientConfig{
-		CAData: caData,
-	}
-
-	return &rest.Config{
-		// TODO: switch to using cluster DNS.
-		Host:            controlEndpoint,
-		TLSClientConfig: tlsClientConfig,
-		BearerToken:     serviceAccountToken,
-	}, nil
-}
-
-func GetFabricKubeConfigFromEnv() (*rest.Config, error) {
-	fabricServiceAccountToken := os.Getenv("FABRIC_SERVICE_ACCOUNT_TOKEN")
-	if fabricServiceAccountToken == "" {
-		return nil, errors.New("error fetching fabric service account token. Environment variable FABRIC_SERVICE_ACCOUNT_TOKEN is not set")
-	}
-
-	fabricControlPlaneEndpoint := os.Getenv("FABRIC_CLUSTER_CONTROL_ENDPOINT")
-	if fabricControlPlaneEndpoint == "" {
-		return nil, errors.New("error fetching fabric control plane endpoint. Environment variable FABRIC_CLUSTER_CONTROL_ENDPOINT is not set")
-	}
-
-	fabricCAData := os.Getenv("FABRIC_CLUSTER_CA_DATA")
-	if fabricCAData == "" {
-		return nil, errors.New("error fetching fabric CA data. Environment variable FABRIC_CLUSTER_CA_DATA is not set")
-	}
-
-	config, err := serviceAccountClusterConfig(fabricServiceAccountToken, fabricControlPlaneEndpoint, []byte(fabricCAData))
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create kube config from secret")
-	}
-	return config, nil
-}
-
-func GetFabricHostOverrideFromEnv() *string {
-	fabricHostOverride := os.Getenv("FABRIC_HOST_OVERRIDE")
-
-	if fabricHostOverride == "" {
-		return nil
-	}
-
-	return &fabricHostOverride
-}
 
 // Caller will provide a tag/annotation in the VM template to map interfaces to ip-pools
 // The interfaces will have a name string as well, such as "Workload1"
@@ -259,10 +170,6 @@ func ParseIntfTag(tagStr string) (useDhcp bool, associatedIPPool string, associa
 	return useDhcp, associatedIPPool, associatedIPv6Pool, mtuVal, primaryIntf
 }
 
-func CreateBootstrapSecretName(machine string) string {
-	return fmt.Sprintf("%s-bootstrap", machine)
-}
-
 func CreateKernelArgsSecretName(machine string) string {
 	return fmt.Sprintf("%s-kernel-args", machine)
 }
@@ -276,13 +183,9 @@ func CreateClusterServiceAccountSecretName(serviceAccountName string) string {
 	return serviceAccountName + "-token"
 }
 
-const KernelArgsVolumeLabel = "afo-cfg"
-const KernelArgsSecretKey = "afo.cfg"
+const KernelArgsVolumeLabel = "capkv-cfg"
+const KernelArgsSecretKey = "capkv.cfg"
 const KernelArgsVolumeName = "kernelargsvolume"
-const RootVolumeName = "root"
-const DataVolumeName = "data"
-const CloudInitVolumeName = "cloudinitvolume"
-const DiskDeviceType = "virtio"
 const TokenSecretVolumeName = "cluster-sa-token"
 
 // To identify the mounted volume from the VM, inserting a specific serial
