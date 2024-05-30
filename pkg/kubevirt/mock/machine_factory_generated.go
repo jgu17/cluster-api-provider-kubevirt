@@ -223,7 +223,7 @@ func (m *MockMachineFactory) NewMachine(ctx *context0.MachineContext, client cli
 }
 
 // NewMachine indicates an expected call of NewMachine.
-func (mr *MockMachineFactoryMockRecorder) NewMachine(ctx, client, namespace, sshKeys interface{}) *gomock.Call {
+func (mr *MockMachineFactoryMockRecorder) NewMachine(ctx, client, namespace, sshKeys, serviceAccountSecret interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewMachine", reflect.TypeOf((*MockMachineFactory)(nil).NewMachine), ctx, client, namespace, sshKeys)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewMachine", reflect.TypeOf((*MockMachineFactory)(nil).NewMachine), ctx, client, namespace, sshKeys, serviceAccountSecret)
 }

@@ -2,8 +2,6 @@ module sigs.k8s.io/cluster-api-provider-kubevirt
 
 go 1.21
 
-toolchain go1.21.3
-
 require (
 	github.com/go-logr/logr v1.4.1
 	github.com/golang/mock v1.6.0
@@ -20,7 +18,7 @@ require (
 	k8s.io/client-go v0.29.3
 	k8s.io/component-base v0.29.3
 	k8s.io/klog/v2 v2.110.1
-	k8s.io/kubectl v0.28.3
+	k8s.io/kubectl v0.29.3
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e
 	kubevirt.io/api v1.0.0
 	kubevirt.io/containerized-data-importer-api v1.57.0
@@ -106,7 +104,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/apiextensions-apiserver v0.29.3 // indirect
-	k8s.io/cli-runtime v0.28.3 // indirect
+	k8s.io/cli-runtime v0.29.3 // indirect
 	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00 // indirect
 	kubevirt.io/controller-lifecycle-operator-sdk/api v0.0.0-20220329064328-f3cc58c6ed90 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
