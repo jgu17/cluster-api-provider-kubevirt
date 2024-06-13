@@ -1,4 +1,4 @@
-module github.com/jgu17/cluster-api-provider-kubevirt
+module sigs.k8s.io/cluster-api-provider-kubevirt
 
 go 1.21
 
@@ -23,7 +23,6 @@ require (
 	kubevirt.io/api v1.0.0
 	kubevirt.io/containerized-data-importer-api v1.57.0
 	sigs.k8s.io/cluster-api v1.5.2
-	sigs.k8s.io/cluster-api-provider-kubevirt v0.1.8
 	sigs.k8s.io/controller-runtime v0.17.3
 	sigs.k8s.io/kind v0.20.0
 	sigs.k8s.io/yaml v1.4.0
@@ -113,5 +112,3 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.14.3-0.20230601165947-6ce0bf390ce3 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 )
-
-replace sigs.k8s.io/cluster-api-provider-kubevirt => github.com/jgu17/cluster-api-provider-kubevirt v0.0.0-20240530211803-66ce64fd9971

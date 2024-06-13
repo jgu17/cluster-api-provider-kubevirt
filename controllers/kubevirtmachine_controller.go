@@ -261,18 +261,20 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 		return reconcile.Result{RequeueAfter: time.Second * 10}, nil
 	}
 
+	ctx.Info("create network config secrets")
 	networkConfigSecret, err := capkvutil.CreateOrUpdateNetworkConfigSecret(
-		ctx.Context,
+		ctx,
 		infraClusterClient,
 		ctx.Machine.GetName(),
 		infraClusterNamespace,
 		ctx.KubevirtCluster.GetName(),
-		ctx.Logger,
 		ctx.KubevirtMachine.Spec.VirtualMachineTemplate.Spec.Template.Spec.Domain.Devices.Interfaces)
 	if err != nil {
+		ctx.Error(err, "failed to reconcile network config secret")
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to reconcile network config secret")
 	}
 
+	ctx.Info("create kernelArgs secrets")
 	_, err = r.reconcileKernelArgsSecretNormal(ctx, infraClusterClient, infraClusterNamespace, networkConfigSecret, ipClaimList)
 	if err != nil {
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to reconcile kernel args secret")
@@ -779,12 +781,11 @@ func (r *KubevirtMachineReconciler) reconcileKernelArgsSecretNormal(
 	ipClaimList []*ipamv1.IPClaim) (*corev1.Secret, error) {
 
 	return capkvutil.CreateOrUpdateKernelArgsSecretNormal(
-		machineCtx.Context,
+		machineCtx,
 		infraClusterClient,
 		machineCtx.KubevirtMachine.Name,
 		infraClusterNamespace,
 		machineCtx.KubevirtCluster.Name,
-		machineCtx.Logger,
 		machineCtx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs,
 		networkConfigSecret,
 		ipClaimList)

@@ -2,7 +2,6 @@ package util
 
 import (
 	"bytes"
-	"context"
 	"encoding/gob"
 	"fmt"
 	"net"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
+	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -60,8 +60,7 @@ type KubeVirtInterfaceInfo struct {
 }
 
 func updateInterfaceInfoFromIPAddressFromClaim(
-	ctx context.Context,
-	logger logr.Logger,
+	ctx *context.MachineContext,
 	fabricClient client.Client,
 	machineName string,
 	intf *KubeVirtInterfaceInfo,
@@ -77,12 +76,12 @@ func updateInterfaceInfoFromIPAddressFromClaim(
 		}
 	}
 	if ipClaim == nil {
-		logger.Info("ipClaim object is a null pointer", "ip-claim", ipClaimName)
+		ctx.Info("ipClaim object is a null pointer", "ip-claim", ipClaimName)
 		return true, errors.Errorf("ipClaim %s: ipClaim object is nil!", ipClaimName)
 	}
 
 	if ipClaim.Status.Address == nil {
-		logger.Info("ipClaim Status and Address object is a null pointer", "ip-claim", ipClaimName)
+		ctx.Info("ipClaim Status and Address object is a null pointer", "ip-claim", ipClaimName)
 		return true, errors.Errorf("ipClaim %s: no ip address object is ready/associated!", ipClaimName)
 	}
 
@@ -97,7 +96,7 @@ func updateInterfaceInfoFromIPAddressFromClaim(
 		return false, err
 	}
 	if ip.Spec.Address == "" {
-		logger.Info("ipClaim object has no associated IP address", "ip-claim", ipClaimName)
+		ctx.Info("ipClaim object has no associated IP address", "ip-claim", ipClaimName)
 		return true, errors.Errorf("ipClaim %s: no ip address associated!", ipClaimName)
 	}
 	nameservers := ip.Spec.DNSServers
@@ -291,8 +290,7 @@ func getNetConfGzB64(interfaces []KubeVirtInterfaceInfo, doGz bool, version int)
 
 // use the intfName2Info table to create fully formed list of interfaces
 func getInterfacesInfo(
-	ctx context.Context,
-	logger logr.Logger,
+	ctx *context.MachineContext,
 	fabricClient client.Client,
 	machineName string,
 	intfName2Info *map[string]KubeVirtInterfaceConfig,
@@ -323,7 +321,6 @@ func getInterfacesInfo(
 		if intfCfg.AssociatedIPV4Pool != "" {
 			shouldRetry, err := updateInterfaceInfoFromIPAddressFromClaim(
 				ctx,
-				logger,
 				fabricClient,
 				machineName,
 				&intf,
@@ -331,7 +328,7 @@ func getInterfacesInfo(
 				intfCfg.IPPoolNamespaceName,
 				ipClaimList)
 			if shouldRetry {
-				logger.Info("Retry from updateInterfaceInfoFromIPAddressFromClaim")
+				ctx.Info("Retry from updateInterfaceInfoFromIPAddressFromClaim")
 				return nil, true, err
 			}
 			if err != nil {
@@ -341,7 +338,6 @@ func getInterfacesInfo(
 		if intfCfg.AssociatedIP6Pool != "" {
 			shouldRetry, err := updateInterfaceInfoFromIPAddressFromClaim(
 				ctx,
-				logger,
 				fabricClient,
 				machineName,
 				&intf,
@@ -349,14 +345,14 @@ func getInterfacesInfo(
 				intfCfg.IP6PoolNamespaceName,
 				ipClaimList)
 			if shouldRetry {
-				logger.Info("Retry from updateInterfaceInfoFromIPAddressFromClaim v6")
+				ctx.Info("Retry from updateInterfaceInfoFromIPAddressFromClaim v6")
 				return nil, true, err
 			}
 			if err != nil {
 				return nil, false, err
 			}
 		}
-		logger.Info("Interface configuration", "machineName", machineName, "configuration", fmt.Sprintf("%+v", intf))
+		ctx.Info("Interface configuration", "machineName", machineName, "configuration", fmt.Sprintf("%+v", intf))
 		intfs[i] = intf
 	}
 
@@ -377,10 +373,9 @@ func getNetworkConfig(
 }
 
 func getNetConfigKernelArg(
-	ctx context.Context,
+	ctx *context.MachineContext,
 	fabricClient client.Client,
 	machineName string,
-	logger logr.Logger,
 	networkConfigSecret *corev1.Secret,
 	ipClaimList []*ipamv1.IPClaim) (string, error) {
 	intfName2Info, err := getNetworkConfig(networkConfigSecret)
@@ -388,9 +383,9 @@ func getNetConfigKernelArg(
 		return "", err
 	}
 
-	interfaces, shouldRetry, err := getInterfacesInfo(ctx, logger, fabricClient, machineName, intfName2Info, ipClaimList)
+	interfaces, shouldRetry, err := getInterfacesInfo(ctx, fabricClient, machineName, intfName2Info, ipClaimList)
 	if shouldRetry || err != nil {
-		logger.Info("Failed to load network configuration")
+		ctx.Info("Failed to load network configuration")
 		if err != nil {
 			err = errors.Wrapf(err, "failed to load network configuration")
 		} else {
@@ -443,10 +438,9 @@ func buildKernelArgsGrubConfig(kernelArgs string) string {
 }
 
 func CreateOrUpdateKernelArgsSecretNormal(
-	ctx context.Context,
+	ctx *context.MachineContext,
 	infraClusterClient client.Client,
 	machineName, targetNamespace, clusterName string,
-	logger logr.Logger,
 	templateKernelArgs *string,
 	networkConfigSecret *corev1.Secret,
 	ipClaimList []*ipamv1.IPClaim) (*corev1.Secret, error) {
@@ -463,14 +457,14 @@ func CreateOrUpdateKernelArgsSecretNormal(
 		}
 
 		// TOGO gujames POC if network data can use the cloudinit data source construct in kubevirt api
-		netConfigKernelArg, err := getNetConfigKernelArg(ctx, infraClusterClient, machineName, logger, networkConfigSecret, ipClaimList)
+		netConfigKernelArg, err := getNetConfigKernelArg(ctx, infraClusterClient, machineName, networkConfigSecret, ipClaimList)
 		if err != nil {
 			return errors.Wrap(err, "failed to create netconfig kernel argument")
 		}
 
 		kernelArgs, err := buildKernelArgs(
 			machineName,
-			logger,
+			ctx.Logger,
 			netConfigKernelArg,
 			templateKernelArgs)
 		if err != nil {
@@ -498,9 +492,9 @@ func CreateOrUpdateKernelArgsSecretNormal(
 
 	switch result {
 	case controllerutil.OperationResultCreated:
-		logger.Info("Created kernel args secret")
+		ctx.Info("Created kernel args secret")
 	case controllerutil.OperationResultUpdated:
-		logger.Info("Updated kernel args secret")
+		ctx.Info("Updated kernel args secret")
 	case controllerutil.OperationResultNone:
 		fallthrough
 	default:
@@ -540,7 +534,7 @@ func assignRandomMac(
 }
 
 func getNetworkConfigSecret(
-	ctx context.Context,
+	ctx *context.MachineContext,
 	fabricClient client.Client,
 	machineName, targetNamespace string) (*corev1.Secret, error) {
 	secret := new(corev1.Secret)
@@ -623,10 +617,9 @@ func MapIntfNameToIntfConfig(interfaces []kubevirtv1.Interface) (*map[string]Kub
 }
 
 func CreateOrUpdateNetworkConfigSecret(
-	ctx context.Context,
+	ctx *context.MachineContext,
 	infraCluserClient client.Client,
 	machineName, infraClusterNamespace, clusterName string,
-	logger logr.Logger,
 	interfaces []kubevirtv1.Interface,
 ) (*corev1.Secret, error) {
 	secret, err := getNetworkConfigSecret(ctx, infraCluserClient, machineName, infraClusterNamespace)
@@ -655,28 +648,30 @@ func CreateOrUpdateNetworkConfigSecret(
 		// Generate a Network Config v2 Yaml with all this information + rename the interface to desired name
 		intfName2Info, err = MapIntfNameToIntfConfig(interfaces)
 		if err != nil {
-			logger.Info("generating mac address config failed, retry from MapIntfNameToIntfConfig")
+			ctx.Info("generating mac address config failed, retry from MapIntfNameToIntfConfig")
 			return err
 		}
 
 		// Generate Mac addresses for each interface in the VM template config.
 		intfName2Info, err = assignRandomMac(intfName2Info)
 		if err != nil {
-			logger.Info("generating mac address config failed, retry from assignRandomMac")
+			ctx.Info("generating mac address config failed, retry from assignRandomMac")
 			return err
 		}
 
 		buffer := bytes.Buffer{}
+		ctx.Info("network config", "content", &buffer)
 		encoder := gob.NewEncoder(&buffer)
 		err = encoder.Encode(*intfName2Info)
 		if err != nil {
-			logger.Info("encoding mac address config failed")
+			ctx.Info("encoding mac address config failed")
 			return err
 		}
 		secret.Data = map[string][]byte{
 			"value": buffer.Bytes(),
 		}
 
+		ctx.Info("network config secret created", "value", secret.Data["value"])
 		if secret.ObjectMeta.Labels == nil {
 			secret.ObjectMeta.Labels = map[string]string{}
 		}
@@ -692,9 +687,9 @@ func CreateOrUpdateNetworkConfigSecret(
 
 	switch result {
 	case controllerutil.OperationResultCreated:
-		logger.Info("Created network config secret", "payload", intfName2Info)
+		ctx.Info("Created network config secret", "payload", intfName2Info)
 	case controllerutil.OperationResultUpdated:
-		logger.Info("Updated network config secret")
+		ctx.Info("Updated network config secret")
 	case controllerutil.OperationResultNone:
 		fallthrough
 	default:
