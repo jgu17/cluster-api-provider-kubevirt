@@ -42,6 +42,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
+	ipamv1 "github.com/metal3-io/ip-address-manager/api/v1alpha1"
+
 	infrav1 "sigs.k8s.io/cluster-api-provider-kubevirt/api/v1alpha1"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/controllers"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/infracluster"
@@ -80,6 +82,7 @@ func registerScheme() (*runtime.Scheme, error) {
 		clusterv1.AddToScheme,
 		kubevirtv1.AddToScheme,
 		cdiv1.AddToScheme,
+		ipamv1.AddToScheme,
 		// +kubebuilder:scaffold:scheme
 	} {
 		if err := f(myscheme); err != nil {
