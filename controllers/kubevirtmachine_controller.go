@@ -71,6 +71,8 @@ type KubevirtMachineReconciler struct {
 // +kubebuilder:rbac:groups=kubevirt.io,resources=virtualmachines;,verbs=get;create;update;patch;delete
 // +kubebuilder:rbac:groups=kubevirt.io,resources=virtualmachineinstances;,verbs=get;delete
 // +kubebuilder:rbac:groups=cdi.kubevirt.io,resources=datavolumes;,verbs=get;list;watch
+// +kubebuilder:rbac:groups="ipam.metal3.io",resources=ipclaims,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups="ipam.metal3.io",resources=ipclaims/status,verbs=get;watch;update;patch
 
 // Reconcile handles KubevirtMachine events.
 func (r *KubevirtMachineReconciler) Reconcile(goctx gocontext.Context, req ctrl.Request) (_ ctrl.Result, rerr error) {
@@ -97,21 +99,6 @@ func (r *KubevirtMachineReconciler) Reconcile(goctx gocontext.Context, req ctrl.
 
 	log = log.WithValues("machine", machine.Name)
 
-	// Handle deleted machines
-	if !kubevirtMachine.ObjectMeta.DeletionTimestamp.IsZero() {
-		// Create the machine context for this request.
-		// Deletion shouldn't require the presence of a
-		// cluster or kubevirtcluster object as those objects
-		// may have already been removed.
-		machineContext := &context.MachineContext{
-			Context:         goctx,
-			Machine:         machine,
-			KubevirtMachine: kubevirtMachine,
-			Logger:          ctrl.LoggerFrom(goctx).WithName(req.Namespace).WithName(req.Name),
-		}
-		return r.reconcileDelete(machineContext)
-	}
-
 	// Fetch the Cluster.
 	cluster, err := util.GetClusterFromMetadata(goctx, r.Client, machine.ObjectMeta)
 	if err != nil {
@@ -124,6 +111,22 @@ func (r *KubevirtMachineReconciler) Reconcile(goctx gocontext.Context, req ctrl.
 	}
 
 	log = log.WithValues("cluster", cluster.Name)
+
+	// Handle deleted machines
+	if !kubevirtMachine.ObjectMeta.DeletionTimestamp.IsZero() {
+		// Create the machine context for this request.
+		// Deletion shouldn't require the presence of a
+		// cluster or kubevirtcluster object as those objects
+		// may have already been removed.
+		machineContext := &context.MachineContext{
+			Context:         goctx,
+			Cluster:         cluster,
+			Machine:         machine,
+			KubevirtMachine: kubevirtMachine,
+			Logger:          ctrl.LoggerFrom(goctx).WithName(req.Namespace).WithName(req.Name),
+		}
+		return r.reconcileDelete(machineContext)
+	}
 
 	// Fetch the KubevirtCluster.
 	kubevirtCluster := &infrav1.KubevirtCluster{}
@@ -265,7 +268,7 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 	networkConfigSecret, err := capkvutil.CreateOrUpdateNetworkConfigSecret(
 		ctx,
 		infraClusterClient,
-		ctx.Machine.GetName(),
+		ctx.KubevirtMachine.GetName(),
 		infraClusterNamespace,
 		ctx.KubevirtCluster.GetName(),
 		ctx.KubevirtMachine.Spec.VirtualMachineTemplate.Spec.Template.Spec.Domain.Devices.Interfaces)
@@ -507,7 +510,6 @@ func (r *KubevirtMachineReconciler) reconcileDelete(ctx *context.MachineContext)
 		}
 	}
 
-	ctx.Info("Deleting VM bootstrap secret...")
 	if err := r.deleteKubevirtBootstrapSecret(ctx, infraClusterClient, vmNamespace); err != nil {
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete bootstrap secret")
 	}
@@ -783,9 +785,9 @@ func (r *KubevirtMachineReconciler) reconcileKernelArgsSecretNormal(
 	return capkvutil.CreateOrUpdateKernelArgsSecretNormal(
 		machineCtx,
 		infraClusterClient,
-		machineCtx.KubevirtMachine.Name,
+		machineCtx.KubevirtMachine.GetName(),
 		infraClusterNamespace,
-		machineCtx.KubevirtCluster.Name,
+		machineCtx.KubevirtCluster.GetName(),
 		machineCtx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs,
 		networkConfigSecret,
 		ipClaimList)
@@ -796,7 +798,7 @@ func (r *KubevirtMachineReconciler) reconcileKernelArgsSecretDelete(machineCtx *
 	secret := &corev1.Secret{}
 	secretName := types.NamespacedName{
 		Namespace: infraClusterNamespace,
-		Name:      capkvutil.CreateKernelArgsSecretName(machineCtx.Machine.GetName()),
+		Name:      capkvutil.CreateKernelArgsSecretName(machineCtx.KubevirtMachine.GetName()),
 	}
 
 	// Use Delete to delete it
@@ -804,42 +806,42 @@ func (r *KubevirtMachineReconciler) reconcileKernelArgsSecretDelete(machineCtx *
 		// if the secret resource is not found, it was already deleted
 		// otherwise return the error
 		if !apierrors.IsNotFound(err) {
-			return errors.Wrapf(err, "failed to get KubeVirtVirtualMachine %s", secretName)
+			return errors.Wrapf(err, "failed to get Kernel args secret %s", secretName)
 		}
 	} else if secret.GetDeletionTimestamp().IsZero() {
 		// this means the secret resource was found and has not been deleted
 		// is this a synchronous call?
 		if err := infraClusterClient.Delete(machineCtx, secret); err != nil {
 			if !apierrors.IsNotFound(err) {
-				return errors.Wrapf(err, "failed to get KubeVirtVirtualMachine %s", secretName)
+				return errors.Wrapf(err, "failed to delete Kernel args secret %s", secretName)
 			}
 		}
 	}
 	return nil
 }
 
-func (r *KubevirtMachineReconciler) reconcileIPClaimsNormal(machineCtx *context.MachineContext, infraClusterClient client.Client) (bool, []*ipamv1.IPClaim, error) {
+func (r *KubevirtMachineReconciler) reconcileIPClaimsNormal(ctx *context.MachineContext, infraClusterClient client.Client) (bool, []*ipamv1.IPClaim, error) {
 
 	readyRet := true
 	claimList := []*ipamv1.IPClaim{}
-	intfName2Info, err := capkvutil.MapIntfNameToIntfConfig(machineCtx.KubevirtMachine.Spec.VirtualMachineTemplate.Spec.Template.Spec.Domain.Devices.Interfaces)
+	intfName2Info, err := capkvutil.MapIntfNameToIntfConfig(ctx.KubevirtMachine.Spec.VirtualMachineTemplate.Spec.Template.Spec.Domain.Devices.Interfaces)
 	if err != nil {
-		machineCtx.Info("could not parse tags correctly")
+		ctx.Info("could not parse tags correctly")
 		return false, claimList, err
 	}
-	vmName := machineCtx.KubevirtMachine.GetName()
+	vmName := ctx.KubevirtMachine.GetName()
 	for intfName, intfCfg := range *intfName2Info {
-		logger := machineCtx.Logger.WithValues("interface", intfName)
+		logger := ctx.Logger.WithValues("interface", intfName)
 		//v4 pool
-		readyV4, ipClaimV4, errV4 := r.reconcileIPClaimOneNormal(machineCtx, infraClusterClient, vmName, intfCfg, capkvutil.IP4)
+		readyV4, ipClaimV4, errV4 := r.reconcileIPClaimOneNormal(ctx, infraClusterClient, vmName, intfCfg, capkvutil.IP4)
 		if errV4 != nil {
-			logger.Info("could not allocate ip-claims")
+			logger.Info("could not allocate ipv4 claim")
 			return readyRet, claimList, err
 		}
 		// If we have an associated ip v6 pool..
-		readyV6, ipClaimV6, errV6 := r.reconcileIPClaimOneNormal(machineCtx, infraClusterClient, vmName, intfCfg, capkvutil.IP6)
+		readyV6, ipClaimV6, errV6 := r.reconcileIPClaimOneNormal(ctx, infraClusterClient, vmName, intfCfg, capkvutil.IP6)
 		if errV6 != nil {
-			logger.Info("could not allocate ipv6-claims")
+			logger.Info("could not allocate ipv6 claim")
 			return readyRet, claimList, err
 		}
 		// Even if one interface should be retried, we should retry
@@ -853,7 +855,7 @@ func (r *KubevirtMachineReconciler) reconcileIPClaimsNormal(machineCtx *context.
 		}
 	}
 
-	machineCtx.Logger.V(debugLogLevel).Info("ip-claims", "readyRet", readyRet)
+	ctx.Logger.V(debugLogLevel).Info("ip-claims", "readyRet", readyRet)
 	return readyRet, claimList, nil
 }
 
@@ -934,8 +936,10 @@ func (r *KubevirtMachineReconciler) reconcileIPClaimOneNormal(
 	case controllerutil.OperationResultUpdated:
 		logger.Info("Updated IP Claim")
 	case controllerutil.OperationResultNone:
+		logger.Info("IP Claim no result")
 		fallthrough
 	default:
+		logger.Info("IP Claim operation result", "value", result)
 	}
 
 	key := client.ObjectKey{
@@ -963,7 +967,7 @@ func (r *KubevirtMachineReconciler) reconcileIPClaimOneNormal(
 		logger.V(debugLogLevel).Info("found cached value for ip-claim status/address")
 	}
 
-	logger.V(debugLogLevel).Info("ipClaim is ready")
+	logger.Info("ipClaim is ready", "claim", ipClaim.GetName())
 	return ready, ipClaim, nil
 }
 
@@ -1074,13 +1078,18 @@ func (r *KubevirtMachineReconciler) reconcileIPClaimsDelete(ctx *context.Machine
 	// Find all IP-Claims across all interesting namespaces
 	var ipClaimsList []*ipamv1.IPClaim
 	for nsName := range uniqueNamespaces {
-		ipClaims, err := getIPClaimsMappedToMachine(ctx, infraClusterClient, nsName, ctx.Cluster.GetNamespace(), ctx.KubevirtCluster.GetName())
+		if ctx.Cluster == nil || ctx.KubevirtMachine == nil {
+			ctx.Info("didn't find cluster or kubevirtmachine, skip IP claim delete")
+			continue
+		}
+		ipClaims, err := getIPClaimsMappedToMachine(ctx, infraClusterClient, nsName, ctx.Cluster.GetName(), ctx.KubevirtMachine.GetName())
 		if err != nil {
 			return err
 		}
 		ipClaimsList = append(ipClaimsList, ipClaims...)
 	}
 
+	ctx.Info(fmt.Sprintf("found %d IP claims to delete", len(ipClaimsList)))
 	for _, ipClaim := range ipClaimsList {
 		name := ipClaim.Name
 		if ipClaim.GetDeletionTimestamp().IsZero() {
@@ -1091,7 +1100,7 @@ func (r *KubevirtMachineReconciler) reconcileIPClaimsDelete(ctx *context.Machine
 					return errors.Wrapf(err, "failed to find ip claim %s", name)
 				}
 			}
-			ctx.Info("deleted", "ip-claim", name, "namespace", ipClaim.Namespace)
+			ctx.Info(fmt.Sprintf("deleted IP claim %s/%s", ipClaim.Namespace, ipClaim.Name))
 		}
 	}
 	return nil
