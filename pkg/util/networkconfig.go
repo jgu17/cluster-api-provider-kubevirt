@@ -7,7 +7,6 @@ import (
 	"net"
 	"strings"
 
-	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
@@ -17,7 +16,6 @@ import (
 
 	ipamv1 "github.com/metal3-io/ip-address-manager/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apitypes "k8s.io/apimachinery/pkg/types"
 	kubevirtv1 "kubevirt.io/api/core/v1"
@@ -62,12 +60,11 @@ type KubeVirtInterfaceInfo struct {
 func updateInterfaceInfoFromIPAddressFromClaim(
 	ctx *context.MachineContext,
 	fabricClient client.Client,
-	machineName string,
 	intf *KubeVirtInterfaceInfo,
 	ipProtocolType IPProtocolType,
 	namespace string,
 	ipClaimList []*ipamv1.IPClaim) (bool, error) {
-	ipClaimName := CreateIPClaimName(machineName, intf.setName, ipProtocolType)
+	ipClaimName := CreateIPClaimName(ctx.KubevirtMachine.GetName(), intf.setName, ipProtocolType)
 	var ipClaim *ipamv1.IPClaim = nil
 	for _, ipc := range ipClaimList {
 		if ipc.Name == ipClaimName {
@@ -292,7 +289,6 @@ func getNetConfGzB64(interfaces []KubeVirtInterfaceInfo, doGz bool, version int)
 func getInterfacesInfo(
 	ctx *context.MachineContext,
 	fabricClient client.Client,
-	machineName string,
 	intfName2Info *map[string]KubeVirtInterfaceConfig,
 	ipClaimList []*ipamv1.IPClaim) ([]KubeVirtInterfaceInfo, bool, error) {
 	var intfs []KubeVirtInterfaceInfo = make([]KubeVirtInterfaceInfo, len(*intfName2Info))
@@ -322,7 +318,6 @@ func getInterfacesInfo(
 			shouldRetry, err := updateInterfaceInfoFromIPAddressFromClaim(
 				ctx,
 				fabricClient,
-				machineName,
 				&intf,
 				IP4,
 				intfCfg.IPPoolNamespaceName,
@@ -339,7 +334,6 @@ func getInterfacesInfo(
 			shouldRetry, err := updateInterfaceInfoFromIPAddressFromClaim(
 				ctx,
 				fabricClient,
-				machineName,
 				&intf,
 				IP6,
 				intfCfg.IP6PoolNamespaceName,
@@ -352,16 +346,13 @@ func getInterfacesInfo(
 				return nil, false, err
 			}
 		}
-		ctx.Info("Interface configuration", "machineName", machineName, "configuration", fmt.Sprintf("%+v", intf))
 		intfs[i] = intf
 	}
 
 	return intfs, false, nil
 }
 
-func getNetworkConfig(
-	networkConfigSecret *corev1.Secret) (*map[string]KubeVirtInterfaceConfig, error) {
-
+func getNetworkConfig(networkConfigSecret *corev1.Secret) (*map[string]KubeVirtInterfaceConfig, error) {
 	networkConfig := new(map[string]KubeVirtInterfaceConfig)
 	decoder := gob.NewDecoder(bytes.NewReader(networkConfigSecret.Data["value"]))
 	err := decoder.Decode(networkConfig)
@@ -372,18 +363,13 @@ func getNetworkConfig(
 	return networkConfig, nil
 }
 
-func getNetConfigKernelArg(
+func GetCloudInitNetworkConfig(
 	ctx *context.MachineContext,
 	fabricClient client.Client,
-	machineName string,
-	networkConfigSecret *corev1.Secret,
+	intfName2Info *map[string]KubeVirtInterfaceConfig,
 	ipClaimList []*ipamv1.IPClaim) (string, error) {
-	intfName2Info, err := getNetworkConfig(networkConfigSecret)
-	if err != nil {
-		return "", err
-	}
 
-	interfaces, shouldRetry, err := getInterfacesInfo(ctx, fabricClient, machineName, intfName2Info, ipClaimList)
+	interfaces, shouldRetry, err := getInterfacesInfo(ctx, fabricClient, intfName2Info, ipClaimList)
 	if shouldRetry || err != nil {
 		ctx.Info("Failed to load network configuration")
 		if err != nil {
@@ -395,34 +381,27 @@ func getNetConfigKernelArg(
 	}
 
 	// Convert to netconfig and gzip and base64 encode
-	netCfg, err := getNetConfGzB64(interfaces, true, 1)
+	netCfg, err := getNetConfGzB64(interfaces, false, 1)
 	if err != nil {
 		return "", err
 	}
 
-	kernelArg := "network-config=" + netCfg
-	return kernelArg, nil
+	return netCfg, nil
 }
 
-func buildKernelArgs(
-	machineName string,
-	logger logr.Logger,
-	netConfigKernelArg string,
-	templateKernelArgs *string,
-) (string, error) {
-	kernelArgs := netConfigKernelArg
-	if templateKernelArgs != nil {
-		kernelArgs += " "
-		kernelArgs += *templateKernelArgs
+func buildKernelArgs(ctx *context.MachineContext) (string, error) {
+	if ctx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs == nil {
+		return "", nil
 	}
 
-	logger.Info("Kernel arguments passed to Virtual Machine", "kernelArgs", kernelArgs, "virtualMachine", machineName)
+	kernelArgs := *ctx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs
+
 	// Prevent the kernel cmd line for bailing later. x64 only allows 2048 bytes worth of
 	// total length, spaces and all. Prevent unknown issues later
 	if len(kernelArgs) >= 2048 {
 		strErr := "generating kernel args grub config failed because size >= 2048"
 		err := errors.Errorf(strErr)
-		logger.Info(strErr)
+		ctx.Info(strErr)
 		return "", err
 	}
 
@@ -430,7 +409,6 @@ func buildKernelArgs(
 }
 
 func buildKernelArgsGrubConfig(kernelArgs string) string {
-
 	grubConfig := "# GRUB Environment Block\n#\nafo_cmdline="
 	grubConfig += kernelArgs
 	grubConfig += "\n"
@@ -440,47 +418,36 @@ func buildKernelArgsGrubConfig(kernelArgs string) string {
 func CreateOrUpdateKernelArgsSecretNormal(
 	ctx *context.MachineContext,
 	infraClusterClient client.Client,
-	machineName, targetNamespace, clusterName string,
-	templateKernelArgs *string,
-	networkConfigSecret *corev1.Secret,
-	ipClaimList []*ipamv1.IPClaim) (*corev1.Secret, error) {
+	targetNamespace string) (*corev1.Secret, error) {
 	kernelArgsSecret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      CreateKernelArgsSecretName(machineName),
+			Name:      CreateKernelArgsSecretName(ctx.KubevirtMachine.GetName()),
 			Namespace: targetNamespace,
 		},
 	}
 
 	mutateFn := func() (err error) {
-		if kernelArgsSecret.ObjectMeta.Labels != nil && kernelArgsSecret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] == clusterName {
+		if kernelArgsSecret.ObjectMeta.Labels != nil && kernelArgsSecret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] == ctx.KubevirtCluster.GetName() {
 			return nil
 		}
 
-		// TOGO gujames POC if network data can use the cloudinit data source construct in kubevirt api
-		netConfigKernelArg, err := getNetConfigKernelArg(ctx, infraClusterClient, machineName, networkConfigSecret, ipClaimList)
-		if err != nil {
-			return errors.Wrap(err, "failed to create netconfig kernel argument")
-		}
-
-		kernelArgs, err := buildKernelArgs(
-			machineName,
-			ctx.Logger,
-			netConfigKernelArg,
-			templateKernelArgs)
+		kernelArgs, err := buildKernelArgs(ctx)
 		if err != nil {
 			wrappedErr := errors.Wrap(err, "failed to build kubevirt machine kernel args")
 			return wrappedErr
 		}
 
-		kernelArgsGrubConfig := buildKernelArgsGrubConfig(kernelArgs)
+		if kernelArgs != "" {
+			kernelArgs = buildKernelArgsGrubConfig(kernelArgs)
+		}
 
 		kernelArgsSecret.Data = map[string][]byte{
-			KernelArgsSecretKey: []byte(kernelArgsGrubConfig),
+			KernelArgsSecretKey: []byte(kernelArgs),
 		}
 		if kernelArgsSecret.ObjectMeta.Labels == nil {
 			kernelArgsSecret.ObjectMeta.Labels = map[string]string{}
 		}
-		kernelArgsSecret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] = clusterName
+		kernelArgsSecret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] = ctx.KubevirtCluster.GetName()
 
 		return nil
 	}
@@ -509,7 +476,7 @@ func CreateOrUpdateKernelArgsSecretNormal(
 // and store the generated values in a dedicated secret, so that subsequent
 // reconciliations will always reuse already generated values instead of
 // regenerating the addresses.
-func assignRandomMac(
+func AssignRandomMac(
 	intf2NameInfo *map[string]KubeVirtInterfaceConfig) (*map[string]KubeVirtInterfaceConfig, error) {
 	ret := make(map[string]KubeVirtInterfaceConfig)
 	for key, value := range *intf2NameInfo {
@@ -533,14 +500,14 @@ func assignRandomMac(
 	return &ret, nil
 }
 
-func getNetworkConfigSecret(
+func GetNetworkConfigSecret(
 	ctx *context.MachineContext,
 	fabricClient client.Client,
-	machineName, targetNamespace string) (*corev1.Secret, error) {
+	targetNamespace string) (*corev1.Secret, error) {
 	secret := new(corev1.Secret)
 	secretName := apitypes.NamespacedName{
 		Namespace: targetNamespace,
-		Name:      CreateNetworkConfigSecretName(machineName),
+		Name:      CreateNetworkConfigSecretName(ctx.KubevirtMachine.GetName()),
 	}
 	err := fabricClient.Get(ctx, secretName, secret)
 	if err != nil {
@@ -614,88 +581,6 @@ func MapIntfNameToIntfConfig(interfaces []kubevirtv1.Interface) (*map[string]Kub
 	}
 
 	return &intfName2Info, nil
-}
-
-func CreateOrUpdateNetworkConfigSecret(
-	ctx *context.MachineContext,
-	infraCluserClient client.Client,
-	machineName, infraClusterNamespace, clusterName string,
-	interfaces []kubevirtv1.Interface,
-) (*corev1.Secret, error) {
-	secret, err := getNetworkConfigSecret(ctx, infraCluserClient, machineName, infraClusterNamespace)
-	if err != nil {
-		if !apierrors.IsNotFound(err) {
-			return nil, err
-		}
-	} else {
-		return secret, nil
-	}
-
-	secret = &corev1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      CreateNetworkConfigSecretName(machineName),
-			Namespace: infraClusterNamespace,
-		},
-	}
-
-	var intfName2Info *map[string]KubeVirtInterfaceConfig = nil
-
-	mutateFn := func() (err error) {
-		if secret.ObjectMeta.Labels != nil && secret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] == clusterName {
-			return nil
-		}
-
-		// Generate a Network Config v2 Yaml with all this information + rename the interface to desired name
-		intfName2Info, err = MapIntfNameToIntfConfig(interfaces)
-		if err != nil {
-			ctx.Info("generating mac address config failed, retry from MapIntfNameToIntfConfig")
-			return err
-		}
-
-		// Generate Mac addresses for each interface in the VM template config.
-		intfName2Info, err = assignRandomMac(intfName2Info)
-		if err != nil {
-			ctx.Info("generating mac address config failed, retry from assignRandomMac")
-			return err
-		}
-
-		buffer := bytes.Buffer{}
-		ctx.Info("network config", "content", &buffer)
-		encoder := gob.NewEncoder(&buffer)
-		err = encoder.Encode(*intfName2Info)
-		if err != nil {
-			ctx.Info("encoding mac address config failed")
-			return err
-		}
-		secret.Data = map[string][]byte{
-			"value": buffer.Bytes(),
-		}
-
-		ctx.Info("network config secret created", "value", secret.Data["value"])
-		if secret.ObjectMeta.Labels == nil {
-			secret.ObjectMeta.Labels = map[string]string{}
-		}
-		secret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] = clusterName
-
-		return nil
-	}
-
-	result, err := controllerutil.CreateOrUpdate(ctx, infraCluserClient, secret, mutateFn)
-	if err != nil {
-		return nil, err
-	}
-
-	switch result {
-	case controllerutil.OperationResultCreated:
-		ctx.Info("Created network config secret", "payload", intfName2Info)
-	case controllerutil.OperationResultUpdated:
-		ctx.Info("Updated network config secret")
-	case controllerutil.OperationResultNone:
-		fallthrough
-	default:
-	}
-
-	return secret, nil
 }
 
 func ApplyNetworkConfig(

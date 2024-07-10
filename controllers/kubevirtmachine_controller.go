@@ -265,20 +265,17 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 	}
 
 	ctx.Info("create network config secrets")
-	networkConfigSecret, err := capkvutil.CreateOrUpdateNetworkConfigSecret(
+	_, err = r.reconcileNetworkConfigSecretNormal(
 		ctx,
 		infraClusterClient,
-		ctx.KubevirtMachine.GetName(),
-		infraClusterNamespace,
-		ctx.KubevirtCluster.GetName(),
-		ctx.KubevirtMachine.Spec.VirtualMachineTemplate.Spec.Template.Spec.Domain.Devices.Interfaces)
+		infraClusterNamespace, ipClaimList)
 	if err != nil {
 		ctx.Error(err, "failed to reconcile network config secret")
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to reconcile network config secret")
 	}
 
 	ctx.Info("create kernelArgs secrets")
-	_, err = r.reconcileKernelArgsSecretNormal(ctx, infraClusterClient, infraClusterNamespace, networkConfigSecret, ipClaimList)
+	_, err = r.reconcileKernelArgsSecretNormal(ctx, infraClusterClient, infraClusterNamespace)
 	if err != nil {
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to reconcile kernel args secret")
 	}
@@ -778,19 +775,12 @@ func usersYamlNodes(sshAuthorizedKey []byte) (*yaml.Node, *yaml.Node, error) {
 func (r *KubevirtMachineReconciler) reconcileKernelArgsSecretNormal(
 	machineCtx *context.MachineContext,
 	infraClusterClient client.Client,
-	infraClusterNamespace string,
-	networkConfigSecret *corev1.Secret,
-	ipClaimList []*ipamv1.IPClaim) (*corev1.Secret, error) {
+	infraClusterNamespace string) (*corev1.Secret, error) {
 
 	return capkvutil.CreateOrUpdateKernelArgsSecretNormal(
 		machineCtx,
 		infraClusterClient,
-		machineCtx.KubevirtMachine.GetName(),
-		infraClusterNamespace,
-		machineCtx.KubevirtCluster.GetName(),
-		machineCtx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs,
-		networkConfigSecret,
-		ipClaimList)
+		infraClusterNamespace)
 }
 
 func (r *KubevirtMachineReconciler) reconcileKernelArgsSecretDelete(machineCtx *context.MachineContext, infraClusterClient client.Client, infraClusterNamespace string) error {
@@ -857,6 +847,84 @@ func (r *KubevirtMachineReconciler) reconcileIPClaimsNormal(ctx *context.Machine
 
 	ctx.Logger.V(debugLogLevel).Info("ip-claims", "readyRet", readyRet)
 	return readyRet, claimList, nil
+}
+
+func (r *KubevirtMachineReconciler) reconcileNetworkConfigSecretNormal(
+	ctx *context.MachineContext,
+	infraClusterClient client.Client,
+	infraClusterNamespace string,
+	ipClaimList []*ipamv1.IPClaim) (*corev1.Secret, error) {
+	secret, err := capkvutil.GetNetworkConfigSecret(ctx, infraClusterClient, infraClusterNamespace)
+	if err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, err
+		}
+	} else {
+		return secret, nil
+	}
+
+	secret = &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      capkvutil.CreateNetworkConfigSecretName(ctx.KubevirtMachine.GetName()),
+			Namespace: infraClusterNamespace,
+		},
+	}
+
+	var intfName2Info *map[string]capkvutil.KubeVirtInterfaceConfig = nil
+
+	mutateFn := func() (err error) {
+		if secret.ObjectMeta.Labels != nil && secret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] == ctx.KubevirtCluster.GetName() {
+			return nil
+		}
+
+		// Generate a Network Config v2 Yaml with all this information + rename the interface to desired name
+		intfName2Info, err = capkvutil.MapIntfNameToIntfConfig(ctx.KubevirtMachine.Spec.VirtualMachineTemplate.Spec.Template.Spec.Domain.Devices.Interfaces)
+		if err != nil {
+			ctx.Info("generating mac address config failed, retry from MapIntfNameToIntfConfig")
+			return err
+		}
+
+		// Generate Mac addresses for each interface in the VM template config.
+		intfName2Info, err = capkvutil.AssignRandomMac(intfName2Info)
+		if err != nil {
+			ctx.Info("generating mac address config failed, retry from assignRandomMac")
+			return err
+		}
+
+		netConfig, err := capkvutil.GetCloudInitNetworkConfig(ctx, infraClusterClient, intfName2Info, ipClaimList)
+		if err != nil {
+			return errors.Wrap(err, "failed to create cloud init network config")
+		}
+
+		secret.Data = map[string][]byte{
+			"value": []byte(netConfig),
+		}
+
+		ctx.Info("network config secret created", "value", secret.Data["value"])
+		if secret.ObjectMeta.Labels == nil {
+			secret.ObjectMeta.Labels = map[string]string{}
+		}
+		secret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] = ctx.KubevirtCluster.GetName()
+
+		return nil
+	}
+
+	result, err := controllerutil.CreateOrUpdate(ctx, infraClusterClient, secret, mutateFn)
+	if err != nil {
+		return nil, err
+	}
+
+	switch result {
+	case controllerutil.OperationResultCreated:
+		ctx.Info("Created network config secret", "payload", intfName2Info)
+	case controllerutil.OperationResultUpdated:
+		ctx.Info("Updated network config secret")
+	case controllerutil.OperationResultNone:
+		fallthrough
+	default:
+	}
+
+	return secret, nil
 }
 
 func (r *KubevirtMachineReconciler) reconcileIPClaimOneNormal(

@@ -26,6 +26,8 @@ import (
 	"sigs.k8s.io/kind/pkg/cluster/constants"
 
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
+
+	capkvutil "sigs.k8s.io/cluster-api-provider-kubevirt/pkg/util"
 )
 
 type CommandExecutor interface {
@@ -145,6 +147,9 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
 			CloudInitConfigDrive: &kubevirtv1.CloudInitConfigDriveSource{
 				UserDataSecretRef: &corev1.LocalObjectReference{
 					Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-userdata",
+				},
+				NetworkDataSecretRef: &corev1.LocalObjectReference{
+					Name: capkvutil.CreateNetworkConfigSecretName(ctx.KubevirtMachine.GetName()),
 				},
 			},
 		},

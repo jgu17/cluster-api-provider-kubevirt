@@ -183,8 +183,9 @@ func CreateClusterServiceAccountSecretName(serviceAccountName string) string {
 	return serviceAccountName + "-token"
 }
 
-const KernelArgsVolumeLabel = "capkv-cfg"
-const KernelArgsSecretKey = "capkv.cfg"
+// TODO gujames rename the label and key
+const KernelArgsVolumeLabel = "afo-cfg"
+const KernelArgsSecretKey = "afo.cfg"
 const KernelArgsVolumeName = "kernelargsvolume"
 const TokenSecretVolumeName = "cluster-sa-token"
 
