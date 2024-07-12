@@ -48,7 +48,7 @@ type MachineInterface interface {
 
 type MachineFactory interface {
 	// NewMachine returns a new Machine service for the given context.
-	NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret) (MachineInterface, error)
+	NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret, networkDataSecret *corev1.Secret) (MachineInterface, error)
 }
 
 // DefaultMachineFactory is the default implementation of MachineFactory
@@ -56,8 +56,8 @@ type DefaultMachineFactory struct {
 }
 
 // NewMachine creates a new kubevirt.machine
-func (defaultMachineFactory DefaultMachineFactory) NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret) (MachineInterface, error) {
-	externalMachine, err := NewMachine(ctx, client, namespace, sshKeys, serviceAccountSecret)
+func (defaultMachineFactory DefaultMachineFactory) NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret, networkDataSecret *corev1.Secret) (MachineInterface, error) {
+	externalMachine, err := NewMachine(ctx, client, namespace, sshKeys, serviceAccountSecret, networkDataSecret)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create helper for managing the externalMachine")
 	}

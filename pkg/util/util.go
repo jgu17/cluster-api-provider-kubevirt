@@ -170,15 +170,6 @@ func ParseIntfTag(tagStr string) (useDhcp bool, associatedIPPool string, associa
 	return useDhcp, associatedIPPool, associatedIPv6Pool, mtuVal, primaryIntf
 }
 
-func CreateKernelArgsSecretName(machine string) string {
-	return fmt.Sprintf("%s-kernel-args", machine)
-}
-
-// TODO move into annotation on the kubevirtmachine object
-func CreateNetworkConfigSecretName(machine string) string {
-	return fmt.Sprintf("%s-network-config", machine)
-}
-
 func CreateClusterServiceAccountSecretName(serviceAccountName string) string {
 	return serviceAccountName + "-token"
 }

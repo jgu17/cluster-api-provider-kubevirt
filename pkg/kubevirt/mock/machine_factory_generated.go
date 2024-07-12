@@ -214,9 +214,9 @@ func (m *MockMachineFactory) EXPECT() *MockMachineFactoryMockRecorder {
 }
 
 // NewMachine mocks base method.
-func (m *MockMachineFactory) NewMachine(ctx *context0.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret) (kubevirt.MachineInterface, error) {
+func (m *MockMachineFactory) NewMachine(ctx *context0.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret, networkDataSecret *corev1.Secret) (kubevirt.MachineInterface, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NewMachine", ctx, client, namespace, sshKeys, serviceAccountSecret)
+	ret := m.ctrl.Call(m, "NewMachine", ctx, client, namespace, sshKeys, serviceAccountSecret, networkDataSecret)
 	ret0, _ := ret[0].(kubevirt.MachineInterface)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1

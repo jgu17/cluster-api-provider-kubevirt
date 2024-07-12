@@ -265,7 +265,7 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 	}
 
 	ctx.Info("create network config secrets")
-	_, err = r.reconcileNetworkConfigSecretNormal(
+	networkDataSecret, err := r.reconcileNetworkDataSecretNormal(
 		ctx,
 		infraClusterClient,
 		infraClusterNamespace, ipClaimList)
@@ -296,7 +296,7 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 	}
 
 	// Create a helper for managing the KubeVirt VM hosting the machine.
-	externalMachine, err := r.MachineFactory.NewMachine(ctx, infraClusterClient, vmNamespace, clusterNodeSshKeys, serviceAccountSecret)
+	externalMachine, err := r.MachineFactory.NewMachine(ctx, infraClusterClient, vmNamespace, clusterNodeSshKeys, serviceAccountSecret, networkDataSecret)
 	if err != nil {
 		return ctrl.Result{}, errors.Wrapf(err, "failed to create helper for managing the externalMachine")
 	}
@@ -496,7 +496,7 @@ func (r *KubevirtMachineReconciler) reconcileDelete(ctx *context.MachineContext)
 	}
 
 	ctx.Info("Deleting VM...")
-	externalMachine, err := kubevirt.NewMachine(ctx, infraClusterClient, vmNamespace, nil, nil)
+	externalMachine, err := kubevirt.NewMachine(ctx, infraClusterClient, vmNamespace, nil, nil, nil)
 	if err != nil {
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to create helper for externalMachine access")
 	}
@@ -511,7 +511,7 @@ func (r *KubevirtMachineReconciler) reconcileDelete(ctx *context.MachineContext)
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete bootstrap secret")
 	}
 
-	if err := r.reconcileNetworkConfigSecretDelete(ctx, infraClusterClient, infraClusterNamespace); err != nil {
+	if err := r.reconcileNetworkDataSecretDelete(ctx, infraClusterClient, infraClusterNamespace); err != nil {
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete network config secret")
 	}
 
@@ -783,16 +783,16 @@ func (r *KubevirtMachineReconciler) reconcileKernelArgsSecretNormal(
 		infraClusterNamespace)
 }
 
-func (r *KubevirtMachineReconciler) reconcileKernelArgsSecretDelete(machineCtx *context.MachineContext, infraClusterClient client.Client, infraClusterNamespace string) error {
+func (r *KubevirtMachineReconciler) reconcileKernelArgsSecretDelete(ctx *context.MachineContext, infraClusterClient client.Client, infraClusterNamespace string) error {
 	// use Get to find secret
 	secret := &corev1.Secret{}
 	secretName := types.NamespacedName{
 		Namespace: infraClusterNamespace,
-		Name:      capkvutil.CreateKernelArgsSecretName(machineCtx.KubevirtMachine.GetName()),
+		Name:      *ctx.Machine.Spec.Bootstrap.DataSecretName + "-kernel-args",
 	}
 
 	// Use Delete to delete it
-	if err := infraClusterClient.Get(machineCtx, secretName, secret); err != nil {
+	if err := infraClusterClient.Get(ctx, secretName, secret); err != nil {
 		// if the secret resource is not found, it was already deleted
 		// otherwise return the error
 		if !apierrors.IsNotFound(err) {
@@ -801,7 +801,7 @@ func (r *KubevirtMachineReconciler) reconcileKernelArgsSecretDelete(machineCtx *
 	} else if secret.GetDeletionTimestamp().IsZero() {
 		// this means the secret resource was found and has not been deleted
 		// is this a synchronous call?
-		if err := infraClusterClient.Delete(machineCtx, secret); err != nil {
+		if err := infraClusterClient.Delete(ctx, secret); err != nil {
 			if !apierrors.IsNotFound(err) {
 				return errors.Wrapf(err, "failed to delete Kernel args secret %s", secretName)
 			}
@@ -849,23 +849,23 @@ func (r *KubevirtMachineReconciler) reconcileIPClaimsNormal(ctx *context.Machine
 	return readyRet, claimList, nil
 }
 
-func (r *KubevirtMachineReconciler) reconcileNetworkConfigSecretNormal(
+func (r *KubevirtMachineReconciler) reconcileNetworkDataSecretNormal(
 	ctx *context.MachineContext,
 	infraClusterClient client.Client,
 	infraClusterNamespace string,
 	ipClaimList []*ipamv1.IPClaim) (*corev1.Secret, error) {
 	secret, err := capkvutil.GetNetworkConfigSecret(ctx, infraClusterClient, infraClusterNamespace)
-	if err != nil {
-		if !apierrors.IsNotFound(err) {
-			return nil, err
-		}
-	} else {
+	if err == nil {
 		return secret, nil
+	}
+
+	if !apierrors.IsNotFound(err) {
+		return nil, err
 	}
 
 	secret = &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      capkvutil.CreateNetworkConfigSecretName(ctx.KubevirtMachine.GetName()),
+			Name:      *ctx.Machine.Spec.Bootstrap.DataSecretName + "-networkdata",
 			Namespace: infraClusterNamespace,
 		},
 	}
@@ -891,16 +891,15 @@ func (r *KubevirtMachineReconciler) reconcileNetworkConfigSecretNormal(
 			return err
 		}
 
-		netConfig, err := capkvutil.GetCloudInitNetworkConfig(ctx, infraClusterClient, intfName2Info, ipClaimList)
+		netConfig, err := capkvutil.GetCloudInitConfigDriveNetworkData(ctx, infraClusterClient, intfName2Info, ipClaimList)
 		if err != nil {
 			return errors.Wrap(err, "failed to create cloud init network config")
 		}
 
 		secret.Data = map[string][]byte{
-			"value": []byte(netConfig),
+			"networkdata": []byte(netConfig),
 		}
-
-		ctx.Info("network config secret created", "value", secret.Data["value"])
+		secret.Type = clusterv1.ClusterSecretType
 		if secret.ObjectMeta.Labels == nil {
 			secret.ObjectMeta.Labels = map[string]string{}
 		}
@@ -1087,12 +1086,12 @@ func createIPClaim(
 	return ipClaim, poolName, claimNamespace, err
 }
 
-func (r *KubevirtMachineReconciler) reconcileNetworkConfigSecretDelete(ctx *context.MachineContext, infraClusterClient client.Client, infraClusterNamespace string) error {
+func (r *KubevirtMachineReconciler) reconcileNetworkDataSecretDelete(ctx *context.MachineContext, infraClusterClient client.Client, infraClusterNamespace string) error {
 	// use Get to find secret
 	secret := &corev1.Secret{}
 	secretName := types.NamespacedName{
 		Namespace: infraClusterNamespace,
-		Name:      capkvutil.CreateNetworkConfigSecretName(ctx.KubevirtMachine.GetName()),
+		Name:      *ctx.Machine.Spec.Bootstrap.DataSecretName + "-networkdata",
 	}
 
 	// Use Delete to delete it

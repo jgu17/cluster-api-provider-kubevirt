@@ -56,11 +56,12 @@ type Machine struct {
 
 	sshKeys              *ssh.ClusterNodeSshKeys
 	serviceAccountSecret *corev1.Secret
+	networkDataSecret    *corev1.Secret
 	getCommandExecutor   func(string, *ssh.ClusterNodeSshKeys) ssh.VMCommandExecutor
 }
 
 // NewMachine returns a new Machine service for the given context.
-func NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret) (*Machine, error) {
+func NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret, networkDataSecret *corev1.Secret) (*Machine, error) {
 	machine := &Machine{
 		client:               client,
 		namespace:            namespace,
@@ -69,6 +70,7 @@ func NewMachine(ctx *context.MachineContext, client client.Client, namespace str
 		vmInstance:           nil,
 		sshKeys:              sshKeys,
 		serviceAccountSecret: serviceAccountSecret,
+		networkDataSecret:    networkDataSecret,
 		dataVolumes:          nil,
 		getCommandExecutor:   ssh.NewVMCommandExecutor,
 	}
@@ -215,6 +217,12 @@ func (m *Machine) Create(ctx gocontext.Context) error {
 					},
 				},
 			})
+		}
+
+		// update interface mac addresses
+		err = capkvutil.ApplyNetworkConfig(virtualMachine.Spec.Template.Spec.Domain.Devices.Interfaces, m.networkDataSecret)
+		if err != nil {
+			return err
 		}
 		return nil
 	}

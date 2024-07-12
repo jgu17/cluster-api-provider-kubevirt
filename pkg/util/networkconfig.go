@@ -2,7 +2,6 @@ package util
 
 import (
 	"bytes"
-	"encoding/gob"
 	"fmt"
 	"net"
 	"strings"
@@ -352,18 +351,16 @@ func getInterfacesInfo(
 	return intfs, false, nil
 }
 
-func getNetworkConfig(networkConfigSecret *corev1.Secret) (*map[string]KubeVirtInterfaceConfig, error) {
-	networkConfig := new(map[string]KubeVirtInterfaceConfig)
-	decoder := gob.NewDecoder(bytes.NewReader(networkConfigSecret.Data["value"]))
-	err := decoder.Decode(networkConfig)
-	if err != nil {
+func getCloudInitNetworkData(networkConfigSecret *corev1.Secret) (*CloudInitNetworkConfigV1, error) {
+	networkData := new(CloudInitNetworkConfigV1)
+	if err := yaml.Unmarshal(networkConfigSecret.Data["networkdata"], networkData); err != nil {
 		return nil, err
 	}
 
-	return networkConfig, nil
+	return networkData, nil
 }
 
-func GetCloudInitNetworkConfig(
+func GetCloudInitConfigDriveNetworkData(
 	ctx *context.MachineContext,
 	fabricClient client.Client,
 	intfName2Info *map[string]KubeVirtInterfaceConfig,
@@ -381,12 +378,7 @@ func GetCloudInitNetworkConfig(
 	}
 
 	// Convert to netconfig and gzip and base64 encode
-	netCfg, err := getNetConfGzB64(interfaces, false, 1)
-	if err != nil {
-		return "", err
-	}
-
-	return netCfg, nil
+	return makeCloudInitNetworkConfigV1(interfaces), nil
 }
 
 func buildKernelArgs(ctx *context.MachineContext) (string, error) {
@@ -421,7 +413,7 @@ func CreateOrUpdateKernelArgsSecretNormal(
 	targetNamespace string) (*corev1.Secret, error) {
 	kernelArgsSecret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      CreateKernelArgsSecretName(ctx.KubevirtMachine.GetName()),
+			Name:      *ctx.Machine.Spec.Bootstrap.DataSecretName + "-kernel-args",
 			Namespace: targetNamespace,
 		},
 	}
@@ -444,6 +436,7 @@ func CreateOrUpdateKernelArgsSecretNormal(
 		kernelArgsSecret.Data = map[string][]byte{
 			KernelArgsSecretKey: []byte(kernelArgs),
 		}
+		kernelArgsSecret.Type = clusterv1.ClusterSecretType
 		if kernelArgsSecret.ObjectMeta.Labels == nil {
 			kernelArgsSecret.ObjectMeta.Labels = map[string]string{}
 		}
@@ -507,7 +500,7 @@ func GetNetworkConfigSecret(
 	secret := new(corev1.Secret)
 	secretName := apitypes.NamespacedName{
 		Namespace: targetNamespace,
-		Name:      CreateNetworkConfigSecretName(ctx.KubevirtMachine.GetName()),
+		Name:      *ctx.Machine.Spec.Bootstrap.DataSecretName + "-networkdata",
 	}
 	err := fabricClient.Get(ctx, secretName, secret)
 	if err != nil {
@@ -586,13 +579,17 @@ func MapIntfNameToIntfConfig(interfaces []kubevirtv1.Interface) (*map[string]Kub
 func ApplyNetworkConfig(
 	interfaces []kubevirtv1.Interface,
 	networkConfigSecret *corev1.Secret) error {
-	intfName2Info, err := getNetworkConfig(networkConfigSecret)
+	cloudInitNetworkConfig, err := getCloudInitNetworkData(networkConfigSecret)
 	if err != nil {
 		return err
 	}
 
-	for _, cfg := range *intfName2Info {
-		interfaces[cfg.ID].MacAddress = cfg.Intf.MacAddress
+	for _, cfg := range cloudInitNetworkConfig.Network.Config {
+		for index, inf := range interfaces {
+			if inf.Name == cfg.Name {
+				interfaces[index].MacAddress = cfg.MacAddress
+			}
+		}
 	}
 
 	return nil
