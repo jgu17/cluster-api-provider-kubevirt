@@ -144,13 +144,13 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
 	cloudInitVolume := kubevirtv1.Volume{
 		Name: cloudInitVolumeName,
 		VolumeSource: kubevirtv1.VolumeSource{
-			CloudInitNoCloud: &kubevirtv1.CloudInitNoCloudSource{
+			CloudInitConfigDrive: &kubevirtv1.CloudInitConfigDriveSource{
 				UserDataSecretRef: &corev1.LocalObjectReference{
 					Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-userdata",
 				},
-				NetworkDataSecretRef: &corev1.LocalObjectReference{
-					Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-networkdata",
-				},
+				// NetworkDataSecretRef: &corev1.LocalObjectReference{
+				// 	Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-networkdata",
+				// },
 			},
 		},
 	}

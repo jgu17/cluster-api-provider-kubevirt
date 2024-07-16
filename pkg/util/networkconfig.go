@@ -1,10 +1,8 @@
 package util
 
 import (
-	"bytes"
 	"fmt"
 	"net"
-	"strings"
 
 	"github.com/pkg/errors"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
@@ -150,138 +148,6 @@ func convertMapToList(intfName2Info *map[string]KubeVirtInterfaceConfig) []KubeV
 		intfOrderedList[intfCfg.ID] = intfCfg
 	}
 	return intfOrderedList
-}
-
-// Code to generate Cloud-Init Network Config V2 YAML
-// XXX TODO - Right now, this is hacky code - Ideally we should use
-// something like https://pkg.go.dev/github.com/juju/juju/network/netplan#Ethernet
-// subject to software licensing
-func makeCloudInitNetworkConfigV2(interfaces []KubeVirtInterfaceInfo) string {
-	intfTemplate := `
-  id%d:
-    match:
-      macaddress: '%s'
-    set-name: %s`
-
-	mtuTemplate := `
-    mtu: %d`
-
-	addressTemplate := `
-    addresses:`
-
-	address := `
-      - %s`
-
-	gw4Template := `
-    gateway4: %s`
-
-	gw6Template := `
-    gateway6: %s`
-
-	dhcpTemplate := `
-    dhcp4: %s`
-
-	nameserverTemplate := `
-    nameservers:
-      search: [.]
-      addresses: [%s]`
-
-	netCfgV2Template := `
-version: 2
-ethernets:`
-
-	yamlOutput := netCfgV2Template
-	for i, intf := range interfaces {
-		skipIP4 := false
-		intfAssigned := fmt.Sprintf(intfTemplate, i, intf.mac.String(), intf.setName)
-		if intf.mtu != 0 {
-			intfAssigned += fmt.Sprintf(mtuTemplate, intf.mtu)
-		}
-		if intf.ip4Info.dhcpv4 {
-			intfAssigned += fmt.Sprintf(dhcpTemplate, "true")
-			skipIP4 = true
-		}
-
-		addressHeaderAdded := false
-		gw4 := ""
-		if !skipIP4 {
-			intfAssigned += fmt.Sprintf(dhcpTemplate, "false")
-			ip4 := intf.ip4Info.ipv4Addr.String()
-			mask4, _ := intf.ip4Info.ipv4Mask.Size()
-			if mask4 != 0 {
-				if !addressHeaderAdded {
-					intfAssigned += addressTemplate
-					addressHeaderAdded = true
-				}
-				cidr4 := ip4 + fmt.Sprintf("/%d", mask4)
-				addr4 := fmt.Sprintf(address, cidr4)
-				intfAssigned += addr4
-			}
-			if intf.ip4Info.ipv4Gw.IP.String() != "0.0.0.0" {
-				gw4 = fmt.Sprintf(gw4Template, intf.ip4Info.ipv4Gw.String())
-			}
-		}
-
-		gw6 := ""
-		ip6 := intf.ip6Info.ipv6Addr.String()
-		if ip6 != "" {
-			mask6, _ := intf.ip6Info.ipv6Mask.Size()
-			if mask6 != 0 {
-				if !addressHeaderAdded {
-					intfAssigned += addressTemplate
-					addressHeaderAdded = true
-				}
-				cidr6 := ip6 + fmt.Sprintf("/%d", mask6)
-				addr6 := fmt.Sprintf(address, cidr6)
-				intfAssigned += addr6
-			}
-			if intf.ip6Info.ipv6Gw.IP.String() != "::" {
-				gw6 = fmt.Sprintf(gw6Template, intf.ip6Info.ipv6Gw.String())
-			}
-		}
-
-		if gw4 != "" && intf.primaryIntf {
-			intfAssigned += gw4
-		}
-
-		if gw6 != "" && intf.primaryIntf {
-			intfAssigned += gw6
-		}
-
-		if len(intf.nameservers) > 0 {
-			csvDNS := ""
-			for _, dns := range intf.nameservers {
-				csvDNS += dns.IP.String() + ", "
-			}
-			csvDNS = strings.TrimSuffix(csvDNS, ", ")
-			intfAssigned += fmt.Sprintf(nameserverTemplate, csvDNS)
-		}
-
-		yamlOutput += intfAssigned
-	}
-	return yamlOutput
-}
-
-// use the interfaces argument to create gzipped + base64 network config for use in the VM spec
-func getNetConfGzB64(interfaces []KubeVirtInterfaceInfo, doGz bool, version int) (string, error) {
-	var netConfig string
-	switch version {
-	case 1:
-		netConfig = makeCloudInitNetworkConfigV1(interfaces)
-	case 2:
-		netConfig = makeCloudInitNetworkConfigV2(interfaces)
-	default:
-		return "", fmt.Errorf("unsupported cloud-init network config version %d", version)
-	}
-
-	if !doGz {
-		return EncodeAsBase64(*bytes.NewBuffer([]byte(netConfig))), nil
-	}
-	netConfigGz, err := GzipString(netConfig)
-	if err != nil {
-		return "", err
-	}
-	return EncodeAsBase64(netConfigGz), nil
 }
 
 // use the intfName2Info table to create fully formed list of interfaces
