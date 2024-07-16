@@ -28,6 +28,8 @@ import (
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
 )
 
+const DiskDeviceType = "virtio"
+
 type CommandExecutor interface {
 	ExecuteCommand(command string) (string, error)
 }
@@ -158,7 +160,7 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
 		Name: cloudInitVolumeName,
 		DiskDevice: kubevirtv1.DiskDevice{
 			Disk: &kubevirtv1.DiskTarget{
-				Bus: "virtio",
+				Bus: DiskDeviceType,
 			},
 		},
 	}
