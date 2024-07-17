@@ -386,6 +386,17 @@ var _ = Describe("reconcile a kubevirt machine", func() {
 		Expect(bootstrapDataSecret.Data).To(HaveKeyWithValue("userdata", []byte("shell-script")))
 		Expect(bootstrapDataSecret.Labels).To(HaveLen(1))
 		Expect(bootstrapDataSecret.Labels).To(HaveKeyWithValue("hello", "world"))
+		machineKernelArgsSecretReferenceKey := client.ObjectKey{Namespace: machineContext.Machine.GetNamespace(), Name: *machineBootstrapSecretReferenceName + "-kernel-args"}
+		kernelArgsSecret := &corev1.Secret{}
+		Expect(
+			fakeClient.Get(gocontext.Background(), machineKernelArgsSecretReferenceKey, kernelArgsSecret),
+		).To(Succeed())
+
+		Expect(kernelArgsSecret.Data).NotTo(BeNil())
+
+		kernelCmdLine := string(kernelArgsSecret.Data[kubevirt.KernelArgsSecretKey])
+		Expect(kernelCmdLine).NotTo(BeEmpty())
+		Expect(kernelCmdLine).To(ContainSubstring("capkv_cmdline=isolcpus=1"))
 	})
 
 	It("should ensure deletion of KubevirtMachine garbage collects everything successfully", func() {
@@ -431,6 +442,12 @@ var _ = Describe("reconcile a kubevirt machine", func() {
 		Expect(err).NotTo(HaveOccurred())
 		bootstrapDataSecret := &corev1.Secret{}
 		err = infraClusterClient.Get(gocontext.Background(), machineBootstrapSecretReferenceKey, bootstrapDataSecret)
+		Expect(apierrors.IsNotFound(err)).To(BeTrue())
+
+		//Check kernel args secret is deleted
+		machineKernelArgSecretReferenceKey := client.ObjectKey{Namespace: machineContext.Machine.GetNamespace(), Name: *machineBootstrapSecretReferenceName + "-kernel-args"}
+		kernelArgSecret := &corev1.Secret{}
+		err = infraClusterClient.Get(gocontext.Background(), machineKernelArgSecretReferenceKey, kernelArgSecret)
 		Expect(apierrors.IsNotFound(err)).To(BeTrue())
 
 		//Check finalizer is removed from machine

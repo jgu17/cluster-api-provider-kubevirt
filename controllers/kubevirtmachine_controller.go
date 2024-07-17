@@ -47,7 +47,6 @@ import (
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/infracluster"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/kubevirt"
-	kubevirthandler "sigs.k8s.io/cluster-api-provider-kubevirt/pkg/kubevirt"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/ssh"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/workloadcluster"
 )
@@ -241,9 +240,15 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
 	}
 
+	ctx.Logger.Info("Reconciling bootstrap secret")
 	if err := r.reconcileKubevirtBootstrapSecret(ctx, infraClusterClient, vmNamespace, clusterNodeSshKeys); err != nil {
 		conditions.MarkFalse(ctx.KubevirtMachine, infrav1.VMProvisionedCondition, infrav1.WaitingForBootstrapDataReason, clusterv1.ConditionSeverityInfo, "")
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to fetch kubevirt bootstrap secret")
+	}
+
+	ctx.Logger.Info("Reconciling kernel args secret")
+	if _, err := r.reconcileKernelArgsSecret(ctx, infraClusterClient, infraClusterNamespace); err != nil {
+		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to reconcile kernel args secret")
 	}
 
 	// Create a helper for managing the KubeVirt VM hosting the machine.
@@ -451,8 +456,13 @@ func (r *KubevirtMachineReconciler) reconcileDelete(ctx *context.MachineContext)
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete bootstrap secret")
 	}
 
+	ctx.Logger.Info("Deleting VM Kernel args secret...")
+	if err := r.deleteKernelArgsSecret(ctx, infraClusterClient, vmNamespace); err != nil {
+		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete Kernerl args secret")
+	}
+
 	ctx.Logger.Info("Deleting VM...")
-	externalMachine, err := kubevirthandler.NewMachine(ctx, infraClusterClient, vmNamespace, nil)
+	externalMachine, err := kubevirt.NewMachine(ctx, infraClusterClient, vmNamespace, nil)
 	if err != nil {
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to create helper for externalMachine access")
 	}
@@ -710,4 +720,41 @@ func usersYamlNodes(sshAuthorizedKey []byte) (*yaml.Node, *yaml.Node, error) {
 
 	data := node.Content[0].Content
 	return data[0], data[1], nil
+}
+
+func (r *KubevirtMachineReconciler) reconcileKernelArgsSecret(
+	machineCtx *context.MachineContext,
+	infraClusterClient client.Client,
+	infraClusterNamespace string) (*corev1.Secret, error) {
+
+	return kubevirt.CreateOrUpdateKernelArgsSecretNormal(
+		machineCtx,
+		infraClusterClient,
+		infraClusterNamespace)
+}
+
+func (r *KubevirtMachineReconciler) deleteKernelArgsSecret(ctx *context.MachineContext, infraClusterClient client.Client, infraClusterNamespace string) error {
+	if ctx.Machine.Spec.Bootstrap.DataSecretName == nil {
+		// Machine never got to the point where a bootstrap secret was created
+		return nil
+	}
+	secret := &corev1.Secret{}
+	secretName := types.NamespacedName{
+		Namespace: infraClusterNamespace,
+		Name:      *ctx.Machine.Spec.Bootstrap.DataSecretName + "-kernel-args",
+	}
+
+	if err := infraClusterClient.Get(ctx, secretName, secret); err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil
+		}
+		return errors.Wrapf(err, "failed to retrieve Kernel args secret %s", secretName)
+	} else if secret.GetDeletionTimestamp().IsZero() {
+		if err := infraClusterClient.Delete(ctx, secret); err != nil {
+			if !apierrors.IsNotFound(err) {
+				return errors.Wrapf(err, "failed to delete Kernel args secret %s", secretName)
+			}
+		}
+	}
+	return nil
 }
