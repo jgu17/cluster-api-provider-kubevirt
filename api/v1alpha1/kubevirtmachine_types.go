@@ -37,6 +37,9 @@ type VirtualMachineTemplateSpec struct {
 	ObjectMeta metav1.ObjectMeta `json:"metadata,omitempty"`
 	// VirtualMachineSpec contains the VirtualMachine specification.
 	Spec kubevirtv1.VirtualMachineSpec `json:"spec,omitempty" valid:"required"`
+	// Additional arguments to be passed to the kernel at boot time
+	// +optional
+	KernelArgs *string `json:"kernelArgs,omitempty"`
 }
 
 // KubevirtMachineSpec defines the desired state of KubevirtMachine.

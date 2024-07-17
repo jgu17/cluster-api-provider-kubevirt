@@ -6,6 +6,7 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/utils/pointer"
 	kubevirtv1 "kubevirt.io/api/core/v1"
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
@@ -94,8 +95,8 @@ func NewKubevirtMachine(kubevirtMachineName, machineName string) *infrav1.Kubevi
 				Spec: kubevirtv1.VirtualMachineSpec{
 					Template: &kubevirtv1.VirtualMachineInstanceTemplateSpec{},
 				},
+				KernelArgs: pointer.String("isolcpus=1"),
 			},
-
 			BootstrapCheckSpec: infrav1.VirtualMachineBootstrapCheckSpec{},
 		},
 		Status: infrav1.KubevirtMachineStatus{},

@@ -65,6 +65,12 @@ func (wh *kubevirtMachineTemplateHandler) Handle(_ context.Context, req admissio
 			return admission.Errored(http.StatusBadRequest, err)
 		}
 
+		// Prevent the kernel cmd line for bailing later. x64 only allows 2048 bytes worth of
+		// total length, spaces and all. Prevent unknown issues later
+		if kvTmplt.Spec.Template.Spec.VirtualMachineTemplate.KernelArgs != nil && len(*kvTmplt.Spec.Template.Spec.VirtualMachineTemplate.KernelArgs) >= 2048 {
+			return admission.Errored(http.StatusBadRequest, fmt.Errorf("kernel args length cannot be great than or equal to 2048"))
+		}
+
 	case admissionv1.Update:
 		oldKVTmplt := &v1alpha1.KubevirtMachineTemplate{}
 		// Server Side Apply implementation in ClusterClass and managed topologies requires to dry-run changes on templates.

@@ -10,7 +10,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	. "sigs.k8s.io/controller-runtime"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
@@ -30,7 +29,7 @@ var (
 	fakeClient                client.Client
 	kubevirtClusterReconciler controllers.KubevirtClusterReconciler
 	fakeContext               = goContext.TODO()
-	testLogger                = ctrl.Log.WithName("test")
+	testLogger                = Log.WithName("test")
 	infraClusterMock          *infraclustermock.MockInfraCluster
 )
 

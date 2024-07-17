@@ -22,11 +22,19 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubevirtv1 "kubevirt.io/api/core/v1"
+
+	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/cluster-api/util"
 	"sigs.k8s.io/kind/pkg/cluster/constants"
 
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
+
+const KernelArgsVolumeLabel = "kernelarg-cfg"
+const KernelArgsSecretKey = "kernelarg.cfg"
+const KernelArgsVolumeName = "kernelargsvolume"
 
 type CommandExecutor interface {
 	ExecuteCommand(command string) (string, error)
@@ -161,6 +169,25 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
 	}
 	template.Spec.Domain.Devices.Disks = append(template.Spec.Domain.Devices.Disks, cloudInitDisk)
 
+	kernelArgsVolume := kubevirtv1.Volume{
+		Name: KernelArgsVolumeName,
+		VolumeSource: kubevirtv1.VolumeSource{
+			Secret: &kubevirtv1.SecretVolumeSource{
+				SecretName:  *ctx.Machine.Spec.Bootstrap.DataSecretName + "-kernel-args",
+				VolumeLabel: KernelArgsVolumeLabel,
+			},
+		},
+	}
+	template.Spec.Volumes = append(template.Spec.Volumes, kernelArgsVolume)
+
+	kernelArgsCDRom := kubevirtv1.Disk{
+		Name: KernelArgsVolumeName,
+		DiskDevice: kubevirtv1.DiskDevice{
+			CDRom: &kubevirtv1.CDRomTarget{},
+		},
+	}
+	template.Spec.Domain.Devices.Disks = append(template.Spec.Domain.Devices.Disks, kernelArgsCDRom)
+
 	return template
 }
 
@@ -170,4 +197,72 @@ func nodeRole(ctx *context.MachineContext) string {
 		return constants.ControlPlaneNodeRoleValue
 	}
 	return constants.WorkerNodeRoleValue
+}
+
+func getKernelArgs(ctx *context.MachineContext) string {
+	if ctx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs == nil {
+		return ""
+	}
+	return *ctx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs
+}
+
+func buildKernelArgsGrubConfig(kernelArgs string) string {
+	grubConfig := "# GRUB Environment Block\n#\ncapkv_cmdline="
+	grubConfig += kernelArgs
+	grubConfig += "\n"
+	return grubConfig
+}
+
+func CreateOrUpdateKernelArgsSecretNormal(
+	ctx *context.MachineContext,
+	infraClusterClient client.Client,
+	targetNamespace string) (*corev1.Secret, error) {
+	kernelArgs := getKernelArgs(ctx)
+
+	if kernelArgs == "" {
+		return nil, nil
+	}
+
+	kernelArgsSecret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      *ctx.Machine.Spec.Bootstrap.DataSecretName + "-kernel-args",
+			Namespace: targetNamespace,
+		},
+	}
+
+	mutateFn := func() (err error) {
+		if kernelArgsSecret.ObjectMeta.Labels != nil && kernelArgsSecret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] == ctx.KubevirtCluster.GetName() {
+			return nil
+		}
+
+		kernelArgsConfig := buildKernelArgsGrubConfig(kernelArgs)
+
+		kernelArgsSecret.Data = map[string][]byte{
+			KernelArgsSecretKey: []byte(kernelArgsConfig),
+		}
+		kernelArgsSecret.Type = clusterv1.ClusterSecretType
+		if kernelArgsSecret.ObjectMeta.Labels == nil {
+			kernelArgsSecret.ObjectMeta.Labels = map[string]string{}
+		}
+		kernelArgsSecret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] = ctx.KubevirtCluster.GetName()
+
+		return nil
+	}
+
+	result, err := controllerutil.CreateOrUpdate(ctx, infraClusterClient, kernelArgsSecret, mutateFn)
+	if err != nil {
+		return nil, err
+	}
+
+	switch result {
+	case controllerutil.OperationResultCreated:
+		ctx.Logger.Info("Created kernel args secret")
+	case controllerutil.OperationResultUpdated:
+		ctx.Logger.Info("Updated kernel args secret")
+	case controllerutil.OperationResultNone:
+		fallthrough
+	default:
+	}
+
+	return kernelArgsSecret, nil
 }

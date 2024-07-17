@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 
@@ -90,7 +91,7 @@ var _ = Describe("Template Validation - ensure immutability in update request", 
 			ctx = context.Background()
 		})
 
-		It("should always return OK for create request", func() {
+		It("should return OK for create request", func() {
 			newTemplate := &v1alpha1.KubevirtMachineTemplate{
 				Spec: v1alpha1.KubevirtMachineTemplateSpec{
 					Template: v1alpha1.KubevirtMachineTemplateResource{
@@ -104,6 +105,26 @@ var _ = Describe("Template Validation - ensure immutability in update request", 
 			res := wh.Handle(ctx, req)
 			Expect(res.Allowed).To(BeTrue())
 			Expect(res.Result.Code).To(Equal(int32(http.StatusOK)))
+		})
+
+		It("should return error for create request if kernel args is not less than 2048 characters long", func() {
+			newTemplate := &v1alpha1.KubevirtMachineTemplate{
+				Spec: v1alpha1.KubevirtMachineTemplateSpec{
+					Template: v1alpha1.KubevirtMachineTemplateResource{
+						Spec: v1alpha1.KubevirtMachineSpec{
+							VirtualMachineTemplate: v1alpha1.VirtualMachineTemplateSpec{
+								KernelArgs: pointer.String(strings.Repeat("a", 2048)),
+							},
+						},
+					},
+				},
+			}
+
+			req := newRequest(admissionv1.Create, newTemplate, nil, v1alpha1Codec)
+
+			res := wh.Handle(ctx, req)
+			Expect(res.Allowed).To(BeFalse())
+			Expect(res.Result.Code).To(Equal(int32(http.StatusBadRequest)))
 		})
 
 		It("should always return OK for delete request", func() {
