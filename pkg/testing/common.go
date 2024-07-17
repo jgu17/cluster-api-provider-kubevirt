@@ -11,6 +11,7 @@ import (
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 
 	infrav1 "sigs.k8s.io/cluster-api-provider-kubevirt/api/v1alpha1"
+	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/cloudinit"
 )
 
 func NewCluster(clusterName string, kubevirtCluster *infrav1.KubevirtCluster) *clusterv1.Cluster {
@@ -183,6 +184,30 @@ func NewBootstrapDataSecret(userData []byte) *corev1.Secret {
 	s := &corev1.Secret{}
 	s.Data = make(map[string][]byte)
 	s.Data["userdata"] = userData
+	return s
+}
+
+func NewNetworkDataSecret() *corev1.Secret {
+	s := &corev1.Secret{}
+	s.Data = make(map[string][]byte)
+
+	var cloudInitNetworkConfigV1 cloudinit.CloudInitNetworkConfigV1
+	cloudInitNetworkConfigV1.Network.Version = 1
+
+	// Add a config for each interface
+	var physicalInterfaceConfig cloudinit.Config
+	physicalInterfaceConfig.Type = "physical"
+	physicalInterfaceConfig.Name = "eth1"
+	physicalInterfaceConfig.MacAddress = "b6:66:89:b8:79:d4"
+	physicalInterfaceConfig.MTU = 1500
+	acceptRA := new(bool)
+	*acceptRA = false
+	physicalInterfaceConfig.AcceptRA = acceptRA
+	physicalInterfaceConfig.Subnets = append(physicalInterfaceConfig.Subnets, cloudinit.Subnet{Type: "dhcp4"})
+
+	cloudInitNetworkConfigV1.Network.Config = append(cloudInitNetworkConfigV1.Network.Config, physicalInterfaceConfig)
+
+	s.Data["networkdata"] = []byte(cloudInitNetworkConfigV1.String())
 	return s
 }
 

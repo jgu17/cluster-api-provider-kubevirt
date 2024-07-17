@@ -33,7 +33,7 @@ type ClusterContext struct {
 	context.Context
 	Cluster         *clusterv1.Cluster
 	KubevirtCluster *infrav1.KubevirtCluster
-	Logger          logr.Logger
+	logr.Logger
 }
 
 // String returns KubeVirt cluster GroupVersionKind.

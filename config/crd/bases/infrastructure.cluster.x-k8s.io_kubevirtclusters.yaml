@@ -128,7 +128,11 @@ spec:
                       More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
                     type: string
                 type: object
-                x-kubernetes-map-type: atomic
+                  x-kubernetes-map-type: atomic
+              serviceAccountName:
+                description: Name of service account to use for accessing fabric cluster
+                  resources from the cluster control plane.
+                type: string
               sshKeys:
                 description: SSHKeys is a reference to a local struct for SSH keys
                   persistence.

@@ -9,7 +9,6 @@ import (
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
-	. "sigs.k8s.io/controller-runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -78,7 +77,7 @@ var _ = Describe("Reconcile", func() {
 			setupClient(objects)
 			infraClusterMock.EXPECT().GenerateInfraClusterClient(gomock.Any(), gomock.Any(), gomock.Any()).Return(fakeClient, kubevirtCluster.Namespace, nil)
 
-			result, err := kubevirtClusterReconciler.Reconcile(fakeContext, Request{
+			result, err := kubevirtClusterReconciler.Reconcile(fakeContext, ctrl.Request{
 				NamespacedName: client.ObjectKey{
 					Namespace: kubevirtCluster.Namespace,
 					Name:      kubevirtCluster.Name,
@@ -90,7 +89,7 @@ var _ = Describe("Reconcile", func() {
 		})
 
 		It("should not create cluster when namespace and kubevirtCluster is not specified", func() {
-			result, err := kubevirtClusterReconciler.Reconcile(fakeContext, Request{
+			result, err := kubevirtClusterReconciler.Reconcile(fakeContext, ctrl.Request{
 				NamespacedName: client.ObjectKey{
 					Namespace: "",
 					Name:      "",
@@ -102,7 +101,7 @@ var _ = Describe("Reconcile", func() {
 		})
 
 		It("should not create cluster when invalid namespace and kubevirtCluster is specified", func() {
-			result, err := kubevirtClusterReconciler.Reconcile(fakeContext, Request{
+			result, err := kubevirtClusterReconciler.Reconcile(fakeContext, ctrl.Request{
 				NamespacedName: client.ObjectKey{
 					Namespace: "Invalid Namespace",
 					Name:      "Invalid Name",
@@ -133,7 +132,7 @@ var _ = Describe("Reconcile", func() {
 			setupClient(objects)
 			infraClusterMock.EXPECT().GenerateInfraClusterClient(gomock.Any(), gomock.Any(), gomock.Any()).Return(fakeClient, kubevirtCluster.Namespace, nil)
 
-			_, err := kubevirtClusterReconciler.Reconcile(fakeContext, Request{
+			_, err := kubevirtClusterReconciler.Reconcile(fakeContext, ctrl.Request{
 				NamespacedName: client.ObjectKey{
 					Namespace: kubevirtCluster.Namespace,
 					Name:      kubevirtCluster.Name,
@@ -169,7 +168,7 @@ var _ = Describe("Reconcile", func() {
 				Name:      kubevirtCluster.Name,
 			}
 
-			result, err := kubevirtClusterReconciler.Reconcile(fakeContext, Request{
+			result, err := kubevirtClusterReconciler.Reconcile(fakeContext, ctrl.Request{
 				NamespacedName: namespacedName,
 			})
 			Expect(err).ShouldNot(HaveOccurred())
