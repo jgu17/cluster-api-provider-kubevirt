@@ -177,7 +177,7 @@ func (r *KubevirtClusterReconciler) reconcileNormal(ctx *context.ClusterContext,
 			Port: ctx.KubevirtCluster.Spec.ControlPlaneEndpoint.Port,
 		}
 		// Get LoadBalancer ExternalIP if cluster Service Type is LoadBalancer
-	} else if ctx.KubevirtCluster.Spec.ControlPlaneServiceTemplate.Spec.Type == corev1.ServiceTypeLoadBalancer {
+	} else if ctx.KubevirtCluster.Spec.ControlPlaneServiceTemplate.Spec.Type == "LoadBalancer" {
 		lbip4, err := externalLoadBalancer.ExternalIP(ctx)
 		if err != nil {
 			conditions.MarkFalse(ctx.KubevirtCluster, infrav1.LoadBalancerAvailableCondition, infrav1.LoadBalancerProvisioningFailedReason, clusterv1.ConditionSeverityWarning, err.Error())

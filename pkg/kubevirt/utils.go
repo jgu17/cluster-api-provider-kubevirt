@@ -28,8 +28,6 @@ import (
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
 )
 
-const DiskDeviceTypeVirtIO = "virtio"
-
 type CommandExecutor interface {
 	ExecuteCommand(command string) (string, error)
 }
@@ -148,9 +146,6 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
 				UserDataSecretRef: &corev1.LocalObjectReference{
 					Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-userdata",
 				},
-				// NetworkDataSecretRef: &corev1.LocalObjectReference{
-				// 	Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-networkdata",
-				// },
 			},
 		},
 	}
@@ -160,7 +155,7 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
 		Name: cloudInitVolumeName,
 		DiskDevice: kubevirtv1.DiskDevice{
 			Disk: &kubevirtv1.DiskTarget{
-				Bus: DiskDeviceTypeVirtIO,
+				Bus: "virtio",
 			},
 		},
 	}

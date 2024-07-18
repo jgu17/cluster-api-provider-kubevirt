@@ -11,7 +11,6 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 
-	corev1 "k8s.io/api/core/v1"
 	context0 "sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
 	kubevirt "sigs.k8s.io/cluster-api-provider-kubevirt/pkg/kubevirt"
 	ssh "sigs.k8s.io/cluster-api-provider-kubevirt/pkg/ssh"
@@ -214,16 +213,16 @@ func (m *MockMachineFactory) EXPECT() *MockMachineFactoryMockRecorder {
 }
 
 // NewMachine mocks base method.
-func (m *MockMachineFactory) NewMachine(ctx *context0.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret, networkDataSecret *corev1.Secret) (kubevirt.MachineInterface, error) {
+func (m *MockMachineFactory) NewMachine(ctx *context0.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys) (kubevirt.MachineInterface, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NewMachine", ctx, client, namespace, sshKeys, serviceAccountSecret, networkDataSecret)
+	ret := m.ctrl.Call(m, "NewMachine", ctx, client, namespace, sshKeys)
 	ret0, _ := ret[0].(kubevirt.MachineInterface)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // NewMachine indicates an expected call of NewMachine.
-func (mr *MockMachineFactoryMockRecorder) NewMachine(ctx, client, namespace, sshKeys, serviceAccountSecret interface{}) *gomock.Call {
+func (mr *MockMachineFactoryMockRecorder) NewMachine(ctx, client, namespace, sshKeys interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewMachine", reflect.TypeOf((*MockMachineFactory)(nil).NewMachine), ctx, client, namespace, sshKeys, serviceAccountSecret)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewMachine", reflect.TypeOf((*MockMachineFactory)(nil).NewMachine), ctx, client, namespace, sshKeys)
 }

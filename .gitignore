@@ -3,6 +3,5 @@ cluster-up/
 hack/tools/bin/
 bin/
 .idea/
-# TODO gujames uncomment
-# infrastructure-components.yaml
+infrastructure-components.yaml
 _artifacts

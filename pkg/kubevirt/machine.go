@@ -37,7 +37,6 @@ import (
 	infrav1 "sigs.k8s.io/cluster-api-provider-kubevirt/api/v1alpha1"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/ssh"
-	capkvutil "sigs.k8s.io/cluster-api-provider-kubevirt/pkg/util"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/workloadcluster"
 )
 
@@ -54,25 +53,21 @@ type Machine struct {
 	vmInstance     *kubevirtv1.VirtualMachine
 	dataVolumes    []*cdiv1.DataVolume
 
-	sshKeys              *ssh.ClusterNodeSshKeys
-	serviceAccountSecret *corev1.Secret
-	networkDataSecret    *corev1.Secret
-	getCommandExecutor   func(string, *ssh.ClusterNodeSshKeys) ssh.VMCommandExecutor
+	sshKeys            *ssh.ClusterNodeSshKeys
+	getCommandExecutor func(string, *ssh.ClusterNodeSshKeys) ssh.VMCommandExecutor
 }
 
 // NewMachine returns a new Machine service for the given context.
-func NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret, networkDataSecret *corev1.Secret) (*Machine, error) {
+func NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys) (*Machine, error) {
 	machine := &Machine{
-		client:               client,
-		namespace:            namespace,
-		machineContext:       ctx,
-		vmiInstance:          nil,
-		vmInstance:           nil,
-		sshKeys:              sshKeys,
-		serviceAccountSecret: serviceAccountSecret,
-		networkDataSecret:    networkDataSecret,
-		dataVolumes:          nil,
-		getCommandExecutor:   ssh.NewVMCommandExecutor,
+		client:             client,
+		namespace:          namespace,
+		machineContext:     ctx,
+		vmiInstance:        nil,
+		vmInstance:         nil,
+		sshKeys:            sshKeys,
+		dataVolumes:        nil,
+		getCommandExecutor: ssh.NewVMCommandExecutor,
 	}
 
 	namespacedName := types.NamespacedName{Namespace: namespace, Name: ctx.KubevirtMachine.Name}
@@ -202,28 +197,6 @@ func (m *Machine) Create(ctx gocontext.Context) error {
 
 		virtualMachine.Spec.Template.ObjectMeta.Labels[infrav1.KubevirtMachineNameLabel] = m.machineContext.KubevirtMachine.Name
 		virtualMachine.Spec.Template.ObjectMeta.Labels[infrav1.KubevirtMachineNamespaceLabel] = m.machineContext.KubevirtMachine.Namespace
-
-		if m.serviceAccountSecret != nil {
-			virtualMachine.Spec.Template.Spec.Domain.Devices.Disks = append(virtualMachine.Spec.Template.Spec.Domain.Devices.Disks, kubevirtv1.Disk{
-				Name:       capkvutil.TokenSecretVolumeName,
-				DiskDevice: kubevirtv1.DiskDevice{},
-				Serial:     capkvutil.TokenSecretDiskSerial,
-			})
-			virtualMachine.Spec.Template.Spec.Volumes = append(virtualMachine.Spec.Template.Spec.Volumes, kubevirtv1.Volume{
-				Name: capkvutil.TokenSecretVolumeName,
-				VolumeSource: kubevirtv1.VolumeSource{
-					Secret: &kubevirtv1.SecretVolumeSource{
-						SecretName: m.serviceAccountSecret.Name,
-					},
-				},
-			})
-		}
-
-		// update interface mac addresses
-		err = capkvutil.ApplyNetworkConfig(virtualMachine.Spec.Template.Spec.Domain.Devices.Interfaces, m.networkDataSecret)
-		if err != nil {
-			return err
-		}
 		return nil
 	}
 	if _, err := controllerutil.CreateOrUpdate(ctx, m.client, virtualMachine, mutateFn); err != nil {

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
@@ -48,7 +47,7 @@ type MachineInterface interface {
 
 type MachineFactory interface {
 	// NewMachine returns a new Machine service for the given context.
-	NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret, networkDataSecret *corev1.Secret) (MachineInterface, error)
+	NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys) (MachineInterface, error)
 }
 
 // DefaultMachineFactory is the default implementation of MachineFactory
@@ -56,8 +55,8 @@ type DefaultMachineFactory struct {
 }
 
 // NewMachine creates a new kubevirt.machine
-func (defaultMachineFactory DefaultMachineFactory) NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret, networkDataSecret *corev1.Secret) (MachineInterface, error) {
-	externalMachine, err := NewMachine(ctx, client, namespace, sshKeys, serviceAccountSecret, networkDataSecret)
+func (defaultMachineFactory DefaultMachineFactory) NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys) (MachineInterface, error) {
+	externalMachine, err := NewMachine(ctx, client, namespace, sshKeys)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create helper for managing the externalMachine")
 	}

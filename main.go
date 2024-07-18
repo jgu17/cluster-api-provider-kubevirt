@@ -42,8 +42,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	ipamv1 "github.com/metal3-io/ip-address-manager/api/v1alpha1"
-
 	infrav1 "sigs.k8s.io/cluster-api-provider-kubevirt/api/v1alpha1"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/controllers"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/infracluster"
@@ -57,16 +55,14 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 
 	//flags.
-	metricsBindAddr string
-	// TODO gujames remove it we do not create the fabric manager here
-	metricsBindAddrInfraCluster string
-	enableLeaderElection        bool
-	syncPeriod                  time.Duration
-	concurrency                 int
-	healthAddr                  string
-	webhookPort                 int
-	webhookCertDir              string
-	watchNamespace              string
+	metricsBindAddr      string
+	enableLeaderElection bool
+	syncPeriod           time.Duration
+	concurrency          int
+	healthAddr           string
+	webhookPort          int
+	webhookCertDir       string
+	watchNamespace       string
 )
 
 func init() {
@@ -82,7 +78,6 @@ func registerScheme() (*runtime.Scheme, error) {
 		clusterv1.AddToScheme,
 		kubevirtv1.AddToScheme,
 		cdiv1.AddToScheme,
-		ipamv1.AddToScheme,
 		// +kubebuilder:scaffold:scheme
 	} {
 		if err := f(myscheme); err != nil {
@@ -95,12 +90,6 @@ func registerScheme() (*runtime.Scheme, error) {
 func initFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&metricsBindAddr, "metrics-bind-addr", "localhost:8080",
 		"The address the metric endpoint binds to.")
-	flag.StringVar(
-		&metricsBindAddrInfraCluster,
-		"metrics-bind-addr-fabric",
-		":8081",
-		"The address the infra cluster metric endpoint binds to.",
-	)
 	fs.IntVar(&concurrency, "concurrency", 10,
 		"The number of machines to process simultaneously")
 	fs.BoolVar(&enableLeaderElection, "leader-elect", false,
