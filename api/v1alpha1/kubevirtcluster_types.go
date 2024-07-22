@@ -64,6 +64,11 @@ type KubevirtClusterSpec struct {
 	// InfraClusterSecretRef is a reference to a secret with a kubeconfig for external cluster used for infra.
 	// +optional
 	InfraClusterSecretRef *corev1.ObjectReference `json:"infraClusterSecretRef,omitempty"`
+
+	// Name of service account to use for accessing fabric cluster resources
+	// from the cluster control plane.
+	// +optional
+	ServiceAccountName string `json:"serviceAccountName,omitempty"`
 }
 
 // KubevirtClusterStatus defines the observed state of KubevirtCluster.

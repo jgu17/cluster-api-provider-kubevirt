@@ -44,6 +44,15 @@ const (
 	vmiDeleteGraceTimeoutDurationSeconds = 600 // 10 minutes
 )
 
+const TokenSecretVolumeName = "cluster-sa-token"
+
+// To identify the mounted volume from the VM, inserting a specific serial
+// number, referenced from cluster templates (generated using pseudo code:
+// prefix(base32(TokenSecretVolumeName), 20))
+
+// #nosec G101 -- merely an identifier
+const TokenSecretDiskSerial = "6MNWHK43UMVZC243BFV2"
+
 // Machine implement a service for managing the KubeVirt VM hosting a kubernetes node.
 type Machine struct {
 	client         client.Client
@@ -53,21 +62,23 @@ type Machine struct {
 	vmInstance     *kubevirtv1.VirtualMachine
 	dataVolumes    []*cdiv1.DataVolume
 
-	sshKeys            *ssh.ClusterNodeSshKeys
-	getCommandExecutor func(string, *ssh.ClusterNodeSshKeys) ssh.VMCommandExecutor
+	sshKeys              *ssh.ClusterNodeSshKeys
+	serviceAccountSecret *corev1.Secret
+	getCommandExecutor   func(string, *ssh.ClusterNodeSshKeys) ssh.VMCommandExecutor
 }
 
 // NewMachine returns a new Machine service for the given context.
-func NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys) (*Machine, error) {
+func NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret) (*Machine, error) {
 	machine := &Machine{
-		client:             client,
-		namespace:          namespace,
-		machineContext:     ctx,
-		vmiInstance:        nil,
-		vmInstance:         nil,
-		sshKeys:            sshKeys,
-		dataVolumes:        nil,
-		getCommandExecutor: ssh.NewVMCommandExecutor,
+		client:               client,
+		namespace:            namespace,
+		machineContext:       ctx,
+		vmiInstance:          nil,
+		vmInstance:           nil,
+		sshKeys:              sshKeys,
+		serviceAccountSecret: serviceAccountSecret,
+		dataVolumes:          nil,
+		getCommandExecutor:   ssh.NewVMCommandExecutor,
 	}
 
 	namespacedName := types.NamespacedName{Namespace: namespace, Name: ctx.KubevirtMachine.Name}
@@ -197,6 +208,23 @@ func (m *Machine) Create(ctx gocontext.Context) error {
 
 		virtualMachine.Spec.Template.ObjectMeta.Labels[infrav1.KubevirtMachineNameLabel] = m.machineContext.KubevirtMachine.Name
 		virtualMachine.Spec.Template.ObjectMeta.Labels[infrav1.KubevirtMachineNamespaceLabel] = m.machineContext.KubevirtMachine.Namespace
+
+		if m.serviceAccountSecret != nil {
+			virtualMachine.Spec.Template.Spec.Domain.Devices.Disks = append(virtualMachine.Spec.Template.Spec.Domain.Devices.Disks, kubevirtv1.Disk{
+				Name:       TokenSecretVolumeName,
+				DiskDevice: kubevirtv1.DiskDevice{},
+				Serial:     TokenSecretDiskSerial,
+			})
+			virtualMachine.Spec.Template.Spec.Volumes = append(virtualMachine.Spec.Template.Spec.Volumes, kubevirtv1.Volume{
+				Name: TokenSecretVolumeName,
+				VolumeSource: kubevirtv1.VolumeSource{
+					Secret: &kubevirtv1.SecretVolumeSource{
+						SecretName: m.serviceAccountSecret.Name,
+					},
+				},
+			})
+		}
+
 		return nil
 	}
 	if _, err := controllerutil.CreateOrUpdate(ctx, m.client, virtualMachine, mutateFn); err != nil {
