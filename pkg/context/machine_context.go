@@ -25,6 +25,7 @@ import (
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+	"sigs.k8s.io/cluster-api/util"
 	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 
@@ -39,7 +40,7 @@ type MachineContext struct {
 	KubevirtCluster     *infrav1.KubevirtCluster
 	KubevirtMachine     *infrav1.KubevirtMachine
 	BootstrapDataSecret *corev1.Secret
-	Logger              logr.Logger
+	logr.Logger
 }
 
 // ClusterContext returns cluster context from this machine context
@@ -97,4 +98,9 @@ func (c *MachineContext) HasInjectedCapkSSHKeys(sshPublicKey []byte) bool {
 	}
 
 	return strings.Contains(string(value), string(sshPublicKeyDecoded))
+}
+
+// IsControlPlane returns true if the machine is a control plane.
+func (c *MachineContext) IsControlPlane() bool {
+	return util.IsControlPlaneMachine(c.Machine)
 }

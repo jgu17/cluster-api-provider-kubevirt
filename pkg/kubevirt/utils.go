@@ -35,6 +35,7 @@ import (
 const KernelArgsVolumeLabel = "kernelarg-cfg"
 const KernelArgsSecretKey = "kernelarg.cfg"
 const KernelArgsVolumeName = "kernelargsvolume"
+const DiskDeviceTypeVirtIO = "virtio"
 
 type CommandExecutor interface {
 	ExecuteCommand(command string) (string, error)
@@ -150,9 +151,12 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
 	cloudInitVolume := kubevirtv1.Volume{
 		Name: cloudInitVolumeName,
 		VolumeSource: kubevirtv1.VolumeSource{
-			CloudInitConfigDrive: &kubevirtv1.CloudInitConfigDriveSource{
+			CloudInitNoCloud: &kubevirtv1.CloudInitNoCloudSource{
 				UserDataSecretRef: &corev1.LocalObjectReference{
 					Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-userdata",
+				},
+				NetworkDataSecretRef: &corev1.LocalObjectReference{
+					Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-networkdata",
 				},
 			},
 		},
@@ -163,7 +167,7 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
 		Name: cloudInitVolumeName,
 		DiskDevice: kubevirtv1.DiskDevice{
 			Disk: &kubevirtv1.DiskTarget{
-				Bus: "virtio",
+				Bus: DiskDeviceTypeVirtIO,
 			},
 		},
 	}
