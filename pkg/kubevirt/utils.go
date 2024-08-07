@@ -37,6 +37,14 @@ const KernelArgsSecretKey = "kernelarg.cfg"
 const KernelArgsVolumeName = "kernelargsvolume"
 const DiskDeviceTypeVirtIO = "virtio"
 
+type CloudInitDataSourceType string
+
+const (
+	CloudInitDataSourceNoCloud     CloudInitDataSourceType = "NoCloud"
+	CloudInitDataSourceNoCloudNet  CloudInitDataSourceType = "NoCloudNet"
+	CloudInitDataSourceConfigDrive CloudInitDataSourceType = "ConfigDrive"
+)
+
 type CommandExecutor interface {
 	ExecuteCommand(command string) (string, error)
 }
@@ -155,9 +163,10 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
 				UserDataSecretRef: &corev1.LocalObjectReference{
 					Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-userdata",
 				},
-				NetworkDataSecretRef: &corev1.LocalObjectReference{
-					Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-networkdata",
-				},
+				// TODO gujames remove
+				// NetworkDataSecretRef: &corev1.LocalObjectReference{
+				// 	Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-networkdata",
+				// },
 			},
 		},
 	}
@@ -173,24 +182,26 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
 	}
 	template.Spec.Domain.Devices.Disks = append(template.Spec.Domain.Devices.Disks, cloudInitDisk)
 
-	kernelArgsVolume := kubevirtv1.Volume{
-		Name: KernelArgsVolumeName,
-		VolumeSource: kubevirtv1.VolumeSource{
-			Secret: &kubevirtv1.SecretVolumeSource{
-				SecretName:  *ctx.Machine.Spec.Bootstrap.DataSecretName + "-kernel-args",
-				VolumeLabel: KernelArgsVolumeLabel,
+	if ctx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs != nil && *ctx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs != "" {
+		kernelArgsVolume := kubevirtv1.Volume{
+			Name: KernelArgsVolumeName,
+			VolumeSource: kubevirtv1.VolumeSource{
+				Secret: &kubevirtv1.SecretVolumeSource{
+					SecretName:  *ctx.Machine.Spec.Bootstrap.DataSecretName + "-kernel-args",
+					VolumeLabel: KernelArgsVolumeLabel,
+				},
 			},
-		},
-	}
-	template.Spec.Volumes = append(template.Spec.Volumes, kernelArgsVolume)
+		}
+		template.Spec.Volumes = append(template.Spec.Volumes, kernelArgsVolume)
 
-	kernelArgsCDRom := kubevirtv1.Disk{
-		Name: KernelArgsVolumeName,
-		DiskDevice: kubevirtv1.DiskDevice{
-			CDRom: &kubevirtv1.CDRomTarget{},
-		},
+		kernelArgsCDRom := kubevirtv1.Disk{
+			Name: KernelArgsVolumeName,
+			DiskDevice: kubevirtv1.DiskDevice{
+				CDRom: &kubevirtv1.CDRomTarget{},
+			},
+		}
+		template.Spec.Domain.Devices.Disks = append(template.Spec.Domain.Devices.Disks, kernelArgsCDRom)
 	}
-	template.Spec.Domain.Devices.Disks = append(template.Spec.Domain.Devices.Disks, kernelArgsCDRom)
 
 	return template
 }
@@ -201,13 +212,6 @@ func nodeRole(ctx *context.MachineContext) string {
 		return constants.ControlPlaneNodeRoleValue
 	}
 	return constants.WorkerNodeRoleValue
-}
-
-func getKernelArgs(ctx *context.MachineContext) string {
-	if ctx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs == nil {
-		return ""
-	}
-	return *ctx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs
 }
 
 func buildKernelArgsGrubConfig(kernelArgs string) string {
@@ -221,9 +225,7 @@ func CreateOrUpdateKernelArgsSecretNormal(
 	ctx *context.MachineContext,
 	infraClusterClient client.Client,
 	targetNamespace string) (*corev1.Secret, error) {
-	kernelArgs := getKernelArgs(ctx)
-
-	if kernelArgs == "" {
+	if ctx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs == nil || *ctx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs == "" {
 		return nil, nil
 	}
 
@@ -239,7 +241,7 @@ func CreateOrUpdateKernelArgsSecretNormal(
 			return nil
 		}
 
-		kernelArgsConfig := buildKernelArgsGrubConfig(kernelArgs)
+		kernelArgsConfig := buildKernelArgsGrubConfig(*ctx.KubevirtMachine.Spec.VirtualMachineTemplate.KernelArgs)
 
 		kernelArgsSecret.Data = map[string][]byte{
 			KernelArgsSecretKey: []byte(kernelArgsConfig),

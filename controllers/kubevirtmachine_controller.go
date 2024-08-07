@@ -494,16 +494,6 @@ func (r *KubevirtMachineReconciler) reconcileDelete(ctx *context.MachineContext)
 		vmNamespace = infraClusterNamespace
 	}
 
-	ctx.Logger.Info("Deleting VM bootstrap secret...")
-	if err := r.deleteKubevirtBootstrapSecret(ctx, infraClusterClient, vmNamespace); err != nil {
-		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete bootstrap secret")
-	}
-
-	ctx.Logger.Info("Deleting VM Kernel args secret...")
-	if err := r.deleteKernelArgsSecret(ctx, infraClusterClient, vmNamespace); err != nil {
-		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete Kernerl args secret")
-	}
-
 	ctx.Logger.Info("Deleting VM...")
 	externalMachine, err := kubevirt.NewMachine(ctx, infraClusterClient, vmNamespace, nil, nil, nil)
 	if err != nil {
@@ -516,14 +506,22 @@ func (r *KubevirtMachineReconciler) reconcileDelete(ctx *context.MachineContext)
 		}
 	}
 
+	ctx.Logger.Info("Deleting VM bootstrap secret...")
 	if err := r.deleteKubevirtBootstrapSecret(ctx, infraClusterClient, vmNamespace); err != nil {
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete bootstrap secret")
 	}
 
+	ctx.Logger.Info("Deleting VM Kernel args secret...")
+	if err := r.deleteKernelArgsSecret(ctx, infraClusterClient, vmNamespace); err != nil {
+		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete Kernerl args secret")
+	}
+
+	ctx.Logger.Info("Deleting VM network data secret...")
 	if err := r.deleteNetworkDataSecret(ctx, infraClusterClient, infraClusterNamespace); err != nil {
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete network config secret")
 	}
 
+	ctx.Logger.Info("Deleting VM IP claims...")
 	if err := r.reconcileIPClaimsDelete(ctx, infraClusterClient); err != nil {
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete ip claims")
 	}

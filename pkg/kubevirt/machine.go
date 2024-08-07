@@ -56,12 +56,13 @@ const TokenSecretDiskSerial = "6MNWHK43UMVZC243BFV2"
 
 // Machine implement a service for managing the KubeVirt VM hosting a kubernetes node.
 type Machine struct {
-	client               client.Client
-	namespace            string
-	machineContext       *context.MachineContext
-	vmiInstance          *kubevirtv1.VirtualMachineInstance
-	vmInstance           *kubevirtv1.VirtualMachine
-	dataVolumes          []*cdiv1.DataVolume
+	client         client.Client
+	namespace      string
+	machineContext *context.MachineContext
+	vmiInstance    *kubevirtv1.VirtualMachineInstance
+	vmInstance     *kubevirtv1.VirtualMachine
+	dataVolumes    []*cdiv1.DataVolume
+
 	sshKeys              *ssh.ClusterNodeSshKeys
 	serviceAccountSecret *corev1.Secret
 	networkDataSecret    *corev1.Secret
