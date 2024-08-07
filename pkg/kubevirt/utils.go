@@ -37,6 +37,13 @@ const KernelArgsSecretKey = "kernelarg.cfg"
 const KernelArgsVolumeName = "kernelargsvolume"
 const DiskDeviceTypeVirtIO = "virtio"
 
+type CloudInitDataSourceType string
+const (
+const CloudInitDataSourceNoCloud CloudInitDataSourceType = "NoCloud"	
+const CloudInitDataSourceNoCloudNet CloudInitDataSourceType = "NoCloudNet"
+const CloudInitDataSourceConfigDrive CloudInitDataSourceType = "ConfigDrive"
+)
+
 type CommandExecutor interface {
 	ExecuteCommand(command string) (string, error)
 }
