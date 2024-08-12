@@ -35,7 +35,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	infrav1 "sigs.k8s.io/cluster-api-provider-kubevirt/api/v1alpha1"
-	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/cloudinit"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/ssh"
 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/workloadcluster"
@@ -65,12 +64,11 @@ type Machine struct {
 
 	sshKeys              *ssh.ClusterNodeSshKeys
 	serviceAccountSecret *corev1.Secret
-	networkDataSecret    *corev1.Secret
 	getCommandExecutor   func(string, *ssh.ClusterNodeSshKeys) ssh.VMCommandExecutor
 }
 
 // NewMachine returns a new Machine service for the given context.
-func NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret, networkDataSecret *corev1.Secret) (*Machine, error) {
+func NewMachine(ctx *context.MachineContext, client client.Client, namespace string, sshKeys *ssh.ClusterNodeSshKeys, serviceAccountSecret *corev1.Secret) (*Machine, error) {
 	machine := &Machine{
 		client:               client,
 		namespace:            namespace,
@@ -79,7 +77,6 @@ func NewMachine(ctx *context.MachineContext, client client.Client, namespace str
 		vmInstance:           nil,
 		sshKeys:              sshKeys,
 		serviceAccountSecret: serviceAccountSecret,
-		networkDataSecret:    networkDataSecret,
 		dataVolumes:          nil,
 		getCommandExecutor:   ssh.NewVMCommandExecutor,
 	}
@@ -228,11 +225,7 @@ func (m *Machine) Create(ctx gocontext.Context) error {
 			})
 		}
 
-		// update interface mac addresses
-		err = cloudinit.ApplyNetworkConfig(virtualMachine.Spec.Template.Spec.Domain.Devices.Interfaces, m.networkDataSecret)
-		if err != nil {
-			return err
-		}
+		//TODO gujames check if we need to generate and apply macaddress here or any other network interface config
 		return nil
 	}
 	if _, err := controllerutil.CreateOrUpdate(ctx, m.client, virtualMachine, mutateFn); err != nil {

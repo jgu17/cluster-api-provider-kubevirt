@@ -1,0 +1,3896 @@
+commit 184888d23f745e997fc0a071315b906ec28a7627
+Merge: f7fecf4 28e22aa
+Author: James Gu <james.gu@microsoft.com>
+Date:   Thu Jul 25 17:19:56 2024 +0000
+
+    Merge branch 'kernelargs_capi_v1_6' into int_capi_v1_6
+
+commit 28e22aabbf1b4868fa240aec6d460819d3f40c5d
+Author: James Gu <james.gu@microsoft.com>
+Date:   Thu Jul 25 17:18:46 2024 +0000
+
+    skip kernel arg disk if not specified
+
+commit f7fecf43905798d7232424699739b111f48c6e2f
+Author: James Gu <james.gu@microsoft.com>
+Date:   Thu Jul 25 15:18:48 2024 +0000
+
+    experiment cloud ini no cloud
+
+commit d49946af4a5f37a92595d1df2700513e8108f356
+Merge: 68729e7 f69ae85
+Author: James Gu <james.gu@microsoft.com>
+Date:   Wed Jul 24 16:15:00 2024 +0000
+
+    Merge branch 'networkdata_capi_v1_6' into int_capi_v1_6
+
+commit 68729e7b070d8123cbc6bc29493480c8114a4e42
+Merge: f3e668d c4367fa
+Author: James Gu <james.gu@microsoft.com>
+Date:   Wed Jul 24 15:46:42 2024 +0000
+
+    Merge branch 'serviceaccount_capi_v1_6' into int_capi_v1_6
+
+commit f3e668d8156c57be358d5614b510b8d6987c0be1
+Author: James Gu <james.gu@microsoft.com>
+Date:   Wed Jul 17 22:55:31 2024 +0000
+
+    Add kernel args support
+
+commit c4367fabd8b33a3dbf5c2aefd062d8b02ba6f12b
+Author: James Gu <james.gu@microsoft.com>
+Date:   Thu Jul 18 18:59:28 2024 +0000
+
+    add service account support
+
+commit f69ae85cb73d31056385642bd17138ec770319db
+Author: James Gu <james.gu@microsoft.com>
+Date:   Wed Jul 17 23:28:54 2024 +0000
+
+    Add support for cloud init network data
+
+commit ada65bcdc5b1a149b064ef72d505d3f66d3c2b52
+Merge: f80289f 18aae17
+Author: Kubernetes Prow Robot <20407524+k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Apr 17 06:10:09 2024 -0700
+
+    Merge pull request #280 from nunnatsa/dv-import-fail-reason
+    
+    Add new reason for failed vm
+
+commit 18aae17b9624642fa93e8691e55b9c2da3b4740c
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Apr 16 15:06:33 2024 +0300
+
+    Add new reason for failed vm
+    
+    Support DV's new `ImagePullFailed` reason. Set the machine reason to
+    `DVImagePullFailed`.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit f80289f56d5dd60d342ed28342a4dac139d60266
+Merge: d2b2668 5b1a081
+Author: Kubernetes Prow Robot <20407524+k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Mar 5 22:06:07 2024 -0800
+
+    Merge pull request #277 from aamoyel/topology-dryrun-check
+    
+    feat: check if the request is a dry-run to match CAPI topology design
+
+commit 5b1a0818c5028dcff1273c462f33808e274612df
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Tue Mar 5 16:23:51 2024 +0100
+
+    chore: e2e mod tidy
+
+commit 0c80da0a1c26158252dce70b2a9f01dd38de3b2b
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Tue Mar 5 15:39:19 2024 +0100
+
+    chore: mod tidy
+
+commit dfffaad0d9bc8f5f8a1ca23c7887e81366fc511a
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Tue Mar 5 12:04:02 2024 +0100
+
+    chore: add ptr func to avoid var declaration
+
+commit 2d7cbf39f86aa14f8ed20fbb004752aef109ad28
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Tue Mar 5 11:21:52 2024 +0100
+
+    feat: check if the request is a dry-run to match CAPI topology design
+
+commit d2b26689a9cdb05c683620a9ae711e830c875b98
+Merge: 9371921 94a369b
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Jan 5 20:04:52 2024 +0100
+
+    Merge pull request #276 from nunnatsa/bubble-cond
+    
+    Remove the setup counter from the KVMachine ready status
+
+commit 9371921eafe53398dfd9e3886ac4a0fbb9cf46a5
+Merge: 1ab9fc5 18f3ef1
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Jan 5 19:13:53 2024 +0100
+
+    Merge pull request #275 from bzub/274-remove_hostpath_volume
+    
+    fix: remove hostpath volume and privileged context
+
+commit 94a369b5fe6b8a1cd8f9e5f6e91bed72a5e2e3ab
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Mon Dec 25 10:51:24 2023 +0200
+
+    Remove the setup counter from the KVMachine ready status
+    
+    Cluster-API takes the reason and the message from the infra-machine (in
+    our case, the KubeVirtMachine) `Ready` condition, into `Machine`
+    `InfrastructureReady` condition. Currently the text is something like
+    `"0 of 2 completed"`. This is not very informative.
+    
+    This PR changes the behavior so now the KV Machine Ready condition will
+    include both the reason and the message from the failed condition.
+    
+    That way, the cluster-api `InfrastructureReady` condition, will also
+    contain the same reason and message. This will make the actual issue, if
+    exists, to more accessible to the user.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 1ab9fc51ae51f618cb8732245969c9e1186f9068
+Merge: 35cc2f1 dc8c7bd
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Dec 21 19:32:14 2023 +0100
+
+    Merge pull request #272 from nunnatsa/reflect-vm-status-to-cluster
+    
+    Reflect the VM statuses to the KubeVirtCluster status
+
+commit dc8c7bdd4fe8778c4cdcb98b7812fc6d7f0c7c5a
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Thu Dec 14 11:18:50 2023 +0200
+
+    Reflect the VM statuses to the KubeVirtCluster status
+    
+    If not all the cluster VMs are ready, CAPK operator now sets the new
+    `AllMachinesAreReady` condition in the KubeVirtCluster CR to `False`.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 18f3ef1371e9828efd0e779b0dfae0f1b3660a03
+Author: bzub <bzub@users.noreply.github.com>
+Date:   Fri Dec 15 14:13:58 2023 -0600
+
+    fix: remove hostpath volume and privileged context
+    
+    This change ensures the manager deployment meets restricted pod security
+    standards.
+
+commit 35cc2f125c5dc65ce8c43dee41f65df861be5c9d
+Merge: c2cd191 e1faf70
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Dec 15 20:18:22 2023 +0100
+
+    Merge pull request #273 from davidvossel/add-more-failure-conditions-v1
+    
+    Add condition to KubeVirtMachine when VM Creation Fails
+
+commit e1faf70ad533b3f7975b6344f35574398f611596
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Dec 15 12:59:21 2023 -0500
+
+    Unit test verifying condition when vm create fails
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 003bb19c845e5b5127135708010e4ee0df3d3c68
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Dec 8 16:46:51 2023 -0500
+
+    Add more condition logic for failed VMs
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit c2cd191dd363aed8cd7653206b44ff0f96c46abd
+Merge: 238e1c9 382a961
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Nov 14 07:42:58 2023 +0100
+
+    Merge pull request #270 from bryan-cox/update-client-go
+    
+    Bump k8s.io/client-go to v0.28.2
+
+commit 382a9616b39b5fa39f0cf53cd1d4764ad2cd417a
+Author: Bryan Cox <brcox@redhat.com>
+Date:   Mon Nov 13 11:01:28 2023 -0500
+
+    Bump k8s to v0.28.3
+    
+    Signed-off-by: Bryan Cox <brcox@redhat.com>
+
+commit aa5777e486a8124f306b740f34e92e56f6da2151
+Author: Bryan Cox <brcox@redhat.com>
+Date:   Mon Nov 13 08:51:35 2023 -0500
+
+    Bump k8s.io/client-go to v0.28.2
+    
+    Signed-off-by: Bryan Cox <brcox@redhat.com>
+
+commit 238e1c9560ada1e46ffea6e6f5e1bf20751ed9e1
+Merge: 044d411 e125d1c
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Oct 20 18:27:35 2023 +0200
+
+    Merge pull request #267 from nunnatsa/bump-all
+    
+    Bump dependencies
+
+commit e125d1ca76476da2a725a872111579ab41f31fc7
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Wed Oct 18 17:06:15 2023 +0300
+
+    Remove an old, non relevant e2e test
+    
+    Remove the "creates a simple cluster with ephemeral VMs with Passt" e2e
+    test, as it's not needed anymore.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit e2fe8a1c45bd8e6509e1cb80024f5e7d7e749fd8
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Mon Oct 16 13:12:36 2023 +0300
+
+    update dependencies and fix relevant code
+    
+    Fix the code to use new APIs in the updated dependencies.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 9d04c484714da73d60e1b61754fce42e3cd1c7fe
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Thu Oct 12 10:33:53 2023 +0300
+
+    make e2e a seperate module, to allow diferent dependencies
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 044d4110bfdb7615e261b76843d904d3e4538ea8
+Merge: c8158eb e1f53a9
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Sep 19 01:11:43 2023 -0700
+
+    Merge pull request #266 from qinqon/kccm-v0.5.0
+    
+    kccm: Bump to v0.5.1
+
+commit e1f53a9ff90c58ef837ca29dc65143d936f9a8bb
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Fri Sep 15 07:11:51 2023 +0200
+
+    kccm: Bump to v0.5.1
+    
+    The latest kccm fails if there are no IPs at LB services after some
+    time, this change bump to it and configure the new timeout value.
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit c8158eb0f0ee42a2711e8a11ff5fb441b4cb0ccc
+Merge: 0c5adf9 2e531a9
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Sep 14 00:20:13 2023 -0700
+
+    Merge pull request #265 from davidvossel/stable-ip-v1
+    
+    Don't mark machine ready=false when internalIP is known
+
+commit 2e531a94c6cef85ac176c8a43f7db420a5e23ca8
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Sep 12 17:07:38 2023 -0400
+
+    Don't mark machine ready=false when internalIP is known
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 0c5adf98a177cfb2798e47c5c5f1d8db515091a1
+Merge: 3f4812b d5081e3
+Author: Nahshon Unna Tsameret <60659093+nunnatsa@users.noreply.github.com>
+Date:   Thu Aug 31 15:43:42 2023 +0300
+
+    Merge pull request #262 from orenc1/test_pr
+    
+    Cosmetic Markdown Fix
+
+commit d5081e3efa74bab51bcbd24365d64a4fe2ebee7c
+Author: Oren Cohen <ocohen@redhat.com>
+Date:   Thu Aug 31 09:33:22 2023 +0300
+
+    Cosmetic Markdown Fix
+    
+    Signed-off-by: Oren Cohen <ocohen@redhat.com>
+
+commit 3f4812b7ff6e25b207258b553ecc1e9d21262935
+Merge: b5ebf7b d99927b
+Author: Nahshon Unna Tsameret <60659093+nunnatsa@users.noreply.github.com>
+Date:   Thu Aug 31 10:01:39 2023 +0300
+
+    Merge pull request #261 from nunnatsa/auto-approve-github-action
+    
+    Allow runing github action with `ok-to-test`
+
+commit d99927b0f925aa5b2ccc9fbab57297338961f5a4
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Wed Aug 30 10:41:02 2023 +0300
+
+    Allow runing github action with `ok-to-test`
+    
+    Github actions are not running for non-member contributors, unless a
+    repo admin presses the "Approve and Run" button. The problem with that
+    is that PRs are getting merged with no verification, causing leak of
+    bugs into the codebase.
+    
+    This PR copies a github action from the cluster-api repo, that approve
+    running the github action by adding the `ok-to-test` label.
+    
+    Source: https://github.com/kubernetes-sigs/cluster-api/blob/613a37e0183e818403ff086165bd619393b34178/.github/workflows/pr-gh-workflow-approve.yaml
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit b5ebf7b7b544c67922f4c43351d7110379472e8d
+Merge: 0fe9004 af6825e
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Aug 28 10:01:43 2023 -0700
+
+    Merge pull request #251 from aamoyel/cluster-class
+    
+    Add KubevirtClusterTemplate resource to support ClusterClass feature
+
+commit af6825edfeac67e854508a492ba26766fdde1852
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Sat Aug 26 17:11:14 2023 +0200
+
+    fix: update lb tests to use ClusterContext at Service creation
+
+commit 0fe90040039c792403bb7a7ef74270543a7a9876
+Merge: 7e3af80 d9065fa
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Aug 22 07:42:55 2023 -0700
+
+    Merge pull request #256 from prometherion/chore/declarative-golangci-lint
+    
+    chore(golangci-lint): v1.54.2 pinning and config file
+
+commit d9065fafb7ffe45c7dc7696571ac7eab1e306720
+Author: Dario Tranchitella <dario@tranchitella.eu>
+Date:   Thu Aug 17 13:02:54 2023 +0200
+
+    chore(golangci-lint): v1.54.2 pinning and config file
+
+commit 7e3af805550d129539009aff579ffe83b5d96fc6
+Merge: a7dfcad 1dd9702
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Aug 21 04:25:23 2023 -0700
+
+    Merge pull request #257 from nunnatsa/bump-go-1.20
+    
+    Bump golang to 1.20
+
+commit 1dd9702d39733f6cb7485fc049e12e52b129960a
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Thu Aug 17 16:48:07 2023 +0300
+
+    Bump golang to 1.20
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit a7dfcada8bfe8e53c1b1f48d9cf535e3bbb07bc0
+Merge: 2af983e 68fbea2
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Aug 21 00:33:23 2023 -0700
+
+    Merge pull request #259 from nunnatsa/fix-258
+    
+    Fix "should succeed with the kubevirt cluster being deleted" unit test
+
+commit 68fbea2854ccedb6d2c1f96db1fb2c778f310a7b
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Mon Aug 21 08:28:24 2023 +0300
+
+    Fix make generate-kccm-flavors
+    
+    `make generate-kccm-flavors` generates wrong manifests, setting a
+    constant names where we should use variables.
+    
+    This commit fixes the `hack/kccm-flavor-gen.sh` script so it will
+    replace the hard coded names with the right variables.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit b9550db6a3fc2c5d0444ca1ea91ed2ca7012560a
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Mon Aug 21 07:05:46 2023 +0300
+
+    Fix "should succeed with the kubevirt cluster being deleted" unit test
+    
+    this unit test is broken. This PR fixes it by populating the
+    `KubevirtClusterReconciler.APIReader` field in unit-test, for mocking.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit f454a711d4aa411bf43a420b5df13a64e19dce32
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Fri Aug 18 14:11:41 2023 +0200
+
+    chore: use CEL validation for KubevirtClusterTemplate instead of webhook
+
+commit 2af983e6a5438775e65d1e1296f64fbf07c180e6
+Merge: e35940e fd8eac9
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Aug 15 11:23:21 2023 -0700
+
+    Merge pull request #255 from prometherion/issues/254
+    
+    fix: api reader for CCM clean-up to avoid cache lazy loading
+
+commit e35940e6a660c01c5bb449d3c75362da90694468
+Merge: b3c2554 05cfdc5
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Aug 15 08:05:21 2023 -0700
+
+    Merge pull request #253 from prometherion/issues/252
+    
+    fix(api): default value for KubeVirtCluster.status.ready field
+
+commit fd8eac91cd580d7d687272d63d796db9f62e6150
+Author: Dario Tranchitella <dario@tranchitella.eu>
+Date:   Thu Aug 10 14:09:27 2023 +0200
+
+    fix: api reader for CCM clean-up to avoid cache lazy loading
+
+commit 05cfdc5df07d4e8bf6cf952adfed857bcfb646fc
+Author: Dario Tranchitella <dario@tranchitella.eu>
+Date:   Thu Aug 10 11:49:43 2023 +0200
+
+    fix(api): default value for KubeVirtCluster.status.ready field
+
+commit c29fe33c1f915e9103b5155b27414bf3fd737e47
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Tue Jul 25 10:33:16 2023 +0200
+
+    feat: add ClusterClass support
+
+commit b3c2554752b26307004fd1dfefa6173ce64e9c45
+Merge: d446182 5a86981
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Jul 7 13:11:05 2023 -0700
+
+    Merge pull request #247 from feitnomore/main
+    
+    Frequently Asked Questions
+
+commit 5a869813d5fd9537403c9e5eb9cfd57f54c8a002
+Author: Marcelo Feitoza Parisi <41125128+feitnomore@users.noreply.github.com>
+Date:   Thu Jul 6 17:06:08 2023 -0300
+
+    Update faq.md
+
+commit 8bcbb723f387ddb1945db59fd21166262c9eb399
+Author: feitnomore <marcelo@feitoza.com.br>
+Date:   Fri Jun 30 14:44:59 2023 -0300
+
+    Frequently Asked Questions
+    
+    As documentation is still in very initial phase, I thought it would be
+    nice to have a little FAQ for main questions I've got around the tool
+    when testing it myself.
+    
+    Thanks
+    
+    Signed-off-by: Marcelo Feitoza Parisi <marcelo@feitoza.com.br>
+
+commit d4461826b1f1d8e806a6b42d113025e49c67d9c4
+Merge: 44140e4 75c71b2
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Jun 29 00:28:47 2023 -0700
+
+    Merge pull request #244 from feitnomore/main
+    
+    Fix namespace/cluster name on templates.
+
+commit 44140e4dcf5b82a34318f136ac867732ef5b7493
+Merge: 1b99674 87a8fb7
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Jun 26 08:46:29 2023 -0700
+
+    Merge pull request #242 from nunnatsa/node-drain-external
+    
+    Support VMI eviction also for external infra clusters
+
+commit 87a8fb7fc0d748ad98f9f381fd64285c469cebc0
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Wed Jun 7 14:08:28 2023 +0300
+
+    Support VMI eviction also for external infra clusters
+    
+    CAPK now can drain a node when its VMI is evicted, even if the VMI is
+    running at an external cluster.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 75c71b2e7b605b215856ca4ca9643a900a56fbaf
+Author: Marcelo Feitoza Parisi <41125128+feitnomore@users.noreply.github.com>
+Date:   Sat Jun 24 10:58:34 2023 -0300
+
+    Update cluster-template-persistent-storage-kccm.yaml
+    
+    1. Configmap data for Provider was looking for kvcluster namespace instead of actual cluster namespace.
+    2. Deployment is looking for kvcluster cluster instead of actual cluster name.
+
+commit 770b3eb4ef6b3f86e79969770b1b7a8b30777203
+Author: Marcelo Feitoza Parisi <41125128+feitnomore@users.noreply.github.com>
+Date:   Sat Jun 24 10:57:39 2023 -0300
+
+    Update cluster-template-passt-kccm.yaml
+    
+    1. ConfigMap config for Provider was looking for kvcluster namespace instead of actual cluster namespace.
+    2. Deployment was looking for kvcluster instead of actual cluster name.
+
+commit f420a120abca7df6016b99e7707ddc1ce04cb776
+Author: Marcelo Feitoza Parisi <41125128+feitnomore@users.noreply.github.com>
+Date:   Sat Jun 24 10:56:31 2023 -0300
+
+    Update cluster-template-lb-kccm.yaml
+    
+    1. ConfigMap had Provider config pointing to kvcluster namespace instead of actual cluster namespace.
+    2. Deployment was looking for cluster kvcluster instead of actual cluster name.
+
+commit 525e7be76ba64a514e9d0fa702a3e3a59505e7ce
+Author: Marcelo Feitoza Parisi <41125128+feitnomore@users.noreply.github.com>
+Date:   Sat Jun 24 10:55:30 2023 -0300
+
+    Update cluster-template-kccm.yaml
+    
+    1. ConfigMap had Provider config pointing to kvcluster namespace instead of cluster namespace.
+    2. Deployment was looking for cluster named kvcluster instead of actual cluster name.
+
+commit 1b9967486c3ecfc67e469f78e02e89e33f5c458b
+Merge: f42af14 3d35fd1
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue May 16 08:07:37 2023 -0700
+
+    Merge pull request #235 from aamoyel/main
+    
+    feat: add condition to controlPlaneServiceTemplate in KubevirtCluster…
+
+commit f42af14ac603b0aa1a57667cabd7f7b461277cd6
+Merge: b49257e 66464c1
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed May 10 23:51:18 2023 -0700
+
+    Merge pull request #240 from davidvossel/update-go-net
+    
+    update x/net pkg
+
+commit 66464c187620e89f0e5a1f7f0d2b7c77fdd25492
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue May 9 17:07:41 2023 -0400
+
+    update x/net pkg
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit b49257ef811e137f6eb3ff64a49022f00c949977
+Merge: 0cd24c7 9a7fe21
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed May 3 09:32:14 2023 -0700
+
+    Merge pull request #239 from BarthV/none-mode
+    
+    Add sentinel bootstrap file check modes in CRD
+
+commit 0cd24c74ac5b0086cb55ac43c65326db8a95a2b3
+Merge: 3af4744 9274452
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed May 3 09:30:15 2023 -0700
+
+    Merge pull request #238 from aamoyel/cpendpoint
+    
+    condition to use controlPlaneEndpoint values
+
+commit 3d35fd1db337d20d2ec7bd6750f74b53d8df6194
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Tue Apr 25 18:58:11 2023 +0200
+
+    feat: add condition to controlPlaneServiceTemplate in KubevirtCluster CRD to deploy LB service in namespace provided in metadata
+
+commit 9a7fe21e2ff49b62bda5823266bb7b686418746d
+Author: Barthelemy Vessemont <bvessemont@gmail.com>
+Date:   Tue Apr 25 14:39:23 2023 +0200
+
+    Add sentinel bootstrap file check modes in CRD
+
+commit 92744524eeb106d1d14d10262056e1e892f440a0
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Tue Apr 25 19:24:39 2023 +0200
+
+    condition to use controlPlaneEndpoint values
+
+commit 285f1e6e9b15a925f74d541e914fd462d85b3fb6
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Tue Apr 25 18:52:55 2023 +0200
+
+    Revert "feat: add condition to controlPlaneServiceTemplate in KubevirtCluster CRD to deploy LB service in namespace provided in metadata"
+    
+    This reverts commit ed152f9daed5f119b1662c2017e59d4ba121189d.
+
+commit 38960ce2f8ce757baf8bd43c64ee3a33c9af08a1
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Tue Apr 25 18:51:38 2023 +0200
+
+    condition to use controlPlaneEndpoint values
+
+commit ed152f9daed5f119b1662c2017e59d4ba121189d
+Author: Alan Amoyel <alanamoyel06@gmail.com>
+Date:   Fri Apr 21 11:15:59 2023 +0200
+
+    feat: add condition to controlPlaneServiceTemplate in KubevirtCluster CRD to deploy LB service in namespace provided in metadata
+
+commit 3af474489d6625741111e31465d51bc6a981df68
+Merge: 68ebbe0 73b73d1
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Mar 28 04:34:21 2023 -0700
+
+    Merge pull request #211 from rgolangh/fix-stale-secret
+    
+    Re-fetch the VM secret userdata if it was changed
+
+commit 73b73d19bb90207f18a408e97153fa1cb6faa12c
+Author: Roy Golan <rgolan@redhat.com>
+Date:   Mon Nov 28 15:04:03 2022 +0200
+
+    Rebuild the cloud-init userdata if the soure VM secret changed
+    
+    After 24 hours the userdata secret for a VM contains an outdated value.
+    
+    We must refetch and update the cloud init secret with the latest data,
+    otherwise a node will fail the ignition stage.
+    
+    Signed-off-by: Roy Golan <rgolan@redhat.com>
+
+commit 68ebbe0177b06bdace731b4149976f907419763c
+Merge: 1c6ec37 0861f72
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Mar 7 13:56:34 2023 -0800
+
+    Merge pull request #226 from jmhbnz/main
+    
+    Replace deprecated k8s registry references
+
+commit 0861f72f2a01dfc447c1678e66ef2ff99c73cb1e
+Author: James Blair <mail@jamesblair.net>
+Date:   Sat Feb 25 09:24:09 2023 +1300
+
+    Replace deprecated k8s registry references
+    
+    Problem: Previously all of Kubernetes' image hosting has been out of gcr.io. There were significant egress costs associated with this when images were pulled from entities outside gcp. Refer to https://github.com/kubernetes/k8s.io/wiki/New-Registry-url-for-Kubernetes-(registry.k8s.io)
+    
+    Solution: As highlighted at KubeCon NA 2022 k8s infra SIG update, the replacement for k8s.gcr.io which is registry.k8s.io is now ready for mainstream use and the old k8s.gcr.io has been formally deprecated and projects are requested to migrate off it. This commit migrates remaining references for kubernetes-sigs/cluster-api-provider-kubevirt to registry.k8s.io.
+    Signed-off-by: James Blair <mail@jamesblair.net>
+
+commit 1c6ec370122d9f0b454d5ca89819d3c2ee8fe728
+Merge: 54ac76b c5ff039
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Feb 15 09:42:33 2023 -0800
+
+    Merge pull request #225 from nunnatsa/improve-linter
+    
+    Add the ginkgolinter and fix findings
+
+commit c5ff0395e08e9f726412c3403ecb9c1d33d43d2b
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Feb 14 07:16:12 2023 +0200
+
+    Add the ginkgolinter and fix findings
+    
+    In addition to the ginkgo linter findings, replace this pattern:
+    ```go
+    err = funcRetErr()
+    Expect(err).ToNot(HaveOccurred())
+    ```
+    
+    With the more readable version of:
+    ```go
+    Expect(funcRetErr()).To(Succeed())
+    ```
+    
+    Improve some Eventually usages by using the Gomega parameter instead of returning error, to get cleaner test code.
+    
+    Also, replaced some deprecation methods.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 54ac76bb44a7024f6efb9f4855949bb14e1b7612
+Merge: 884c8ca 8a427a8
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Feb 1 15:51:29 2023 -0800
+
+    Merge pull request #222 from yuanchen8911/rbac
+    
+    Remove kube-rbac-proxy
+
+commit 8a427a82fe1067c12095b8adf2a40a5f5ec6cf04
+Author: Yuan Chen <yuan_chen3@apple.com>
+Date:   Mon Jan 30 17:10:34 2023 -0800
+
+    Remove kube-rbac-proxy
+    
+    Remove kube-rbac-proxy from kubevirtci
+
+commit 884c8ca19f57c6567a8661ab244344f9b587648e
+Merge: cb28bf6 fdccc32
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Jan 10 03:27:28 2023 -0800
+
+    Merge pull request #217 from davidvossel/update-image-1.24
+    
+    Update default image to k8s 1.24.9
+
+commit cb28bf69855129df6830779f060e2bc82ff2985e
+Merge: e4372d3 6e31f47
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Jan 9 23:15:26 2023 -0800
+
+    Merge pull request #216 from davidvossel/no-vm-vmi-watch
+    
+    Remove vmi/vm watch and reduce default sync time to 90 seconds
+
+commit fdccc32a598b1cfb52f74d7018dfe05709b8a147
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Jan 6 12:11:37 2023 -0500
+
+    Update default image to k8s 1.24.9
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 6e31f471bcf8d8b39f880d2ada11c843778b2bf6
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Jan 6 11:05:48 2023 -0500
+
+    Remove vmi/vm watch and reduce default sync time to 90 seconds
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit e4372d30043eff505ed0f2bf5af3ce1ff1723a61
+Merge: 6512a4c d1aee70
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Dec 1 22:53:54 2022 -0800
+
+    Merge pull request #215 from nunnatsa/fix-release
+    
+    Fix the release automation
+
+commit d1aee70e30beec4618f48de414f8845180ec5914
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Fri Dec 2 08:00:09 2022 +0200
+
+    Fix the release automation
+    
+    Remove non-exist file from the release asset list.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 6512a4cb2d519bd9c04927b9cc0c7434b6060ab3
+Merge: d03c80b cf2dd64
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Dec 1 13:57:53 2022 -0800
+
+    Merge pull request #213 from rhrazdil/passt_binding_2
+    
+    Introduce cluster template with Passt binding
+
+commit cf2dd64bcc74caa2be99a8a7551dffe50bd78772
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Tue Nov 29 10:43:14 2022 +0100
+
+    e2e: Test create cluster with Passt binding
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit d03c80b9ae208d0823cdf2948dde4f7d53ee5712
+Merge: e96f47d 35cd1c5
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Nov 29 08:01:23 2022 -0800
+
+    Merge pull request #214 from qinqon/activate-net-multiqueue
+    
+    templates: Activate net multiqueue
+
+commit 35cd1c502a4d0022aab25ff94895296067de9936
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Tue Nov 29 15:55:51 2022 +0100
+
+    templates: Activate net multiqueue
+    
+    This change the templates VM to be with to improve performance by using
+    net multiqueue [1] .
+    
+    [1] https://www.linux-kvm.org/page/Multiqueue#Multiqueue_virtio-net
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit 939d397d8123163be6ecc12e67ec7cbb506cc458
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Tue Nov 29 10:08:48 2022 +0100
+
+    bump kubevirt to v0.59.0-alpha
+    
+    Because v0.58.0 doesn't contain the fix
+    (https://github.com/kubevirt/kubevirt/pull/8578)
+    for passt as it advertises.
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit b3985bf5d477237657ec9c5ee4d5eff717501444
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Mon Sep 26 15:21:39 2022 +0200
+
+    kubevirtci,passt: apply recommended config to infra nodes
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit e15fa8640893a28939036b64b7216de0aef624a8
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Thu Sep 22 15:27:46 2022 +0200
+
+    kubevirtci: add CAPK_TEMPLATE env variable
+    
+    So the template can be easily chosen by setting an env variable
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit eea13f0f07dc18e95b18e5d61f2a72cd2223eca2
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Thu Sep 22 15:24:50 2022 +0200
+
+    passt: enable Passt featureGate
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit 32123fcc667e7b41909891e908d970a65de9c95f
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Thu Sep 22 15:20:40 2022 +0200
+
+    passt: add template with tenant nodes using passt
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit e96f47d3ec3f11610ce15b7b0568fe9a7f0d4511
+Merge: 792dbff 5d8762b
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Nov 28 05:48:07 2022 -0800
+
+    Merge pull request #209 from qinqon/add-all-templates-to-release
+    
+    release: Add all the cluster template flavors
+
+commit 5d8762be2eac429a6f9236b5bce8ba5f425cbb56
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Wed Nov 23 11:03:34 2022 +0100
+
+    release: Add all the cluster template flavors
+    
+    There were missing template flavors at the github release used when a
+    user generate a cluster with --infrastructure kubevirt, this change add
+    all of the flavors and also check that the kccm ones are generated.
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit 792dbff84f80f93d98ba6209a21e6dd51a968dcd
+Merge: 6a77a49 b3e30fb
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Nov 25 00:30:07 2022 -0800
+
+    Merge pull request #206 from rhrazdil/bump_kubevirt
+    
+    Bump kubevirt to 0.58
+
+commit b3e30fb78254befb5a49a3fa8f53c28e1a2da90a
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Mon Nov 7 11:08:39 2022 +0100
+
+    e2e: fetch VMI before removing test finalizer
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit 6a77a49da11bce48c0c1739f76a77a32c6acb48d
+Merge: 2e924ba 47796bc
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Nov 14 12:48:40 2022 -0800
+
+    Merge pull request #208 from brianmcarey/allow-insecure-registry-podman
+    
+    Allow podman to push images to insecure kubevirtci registry
+
+commit 47796bcb1e2edc616febc3667a4748050f84dcdb
+Author: Brian Carey <bcarey@redhat.com>
+Date:   Mon Nov 14 09:25:35 2022 +0000
+
+    Allow podman to push images to insecure kubevirtci registry
+    
+    Add the insecure kubevirtci registry to registries.conf when using
+    podman to push images to the registry.
+    
+    Signed-off-by: Brian Carey <bcarey@redhat.com>
+
+commit 2e924bae28012a7d023c0c99e5fd0faaf736adb8
+Merge: ccae287 58472fc
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Nov 14 06:26:00 2022 -0800
+
+    Merge pull request #207 from nunnatsa/remove-IMAGE_REPO
+    
+    Remove the IMAGE_REPO env var from all the temlates
+
+commit 58472fc20e7c5b63aae922b98db7ed1adfa13851
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Nov 8 08:59:54 2022 +0200
+
+    Change Dockerfile syntax to docker/dockerfile:1.4
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 1c308f387c6c84536bebb6ae204b2774c6ec80f4
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Mon Nov 7 15:12:19 2022 +0200
+
+    Remove the IMAGE_REPO env var from all the temlates
+    
+    cluster-api project wants to stop using the k8s.gcr.io repository, as
+    it's too expensive. After checking in other cluster API project, it
+    seems that this value is no longer in the template.
+    
+    This PR removes all the usage in IMAGE_REPO variable; for that, the PR
+    also upgrade the clusterctl in the kubevirtci script, to v1.2.4
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit a91a2b153bcc123e5d12c1afc902397e916044f3
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Thu Sep 22 10:49:05 2022 +0200
+
+    bump kubevirt to v0.58.0
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit ccae28797861a0c232685823e4f58089b2d75433
+Merge: 9c5f856 475ad69
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Nov 2 14:31:01 2022 -0700
+
+    Merge pull request #204 from hiromu-a5a/docs-pci-passthrough
+    
+    Add docs PCI passthrough
+
+commit 475ad691da2ef59cb0f6439f4a31d7ed8eafa862
+Author: Hiromu Asahina <hiromu.a5a@gmail.com>
+Date:   Mon Oct 31 13:42:56 2022 +0900
+
+    Add docs PCI passthrough
+
+commit 9c5f8565ed56298801120f61fff92bef0330d000
+Merge: cdb7a4c e44e042
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Oct 24 08:20:26 2022 -0700
+
+    Merge pull request #202 from nunnatsa/cluster-template-lb
+    
+    Add and release cluster-template-lb.yaml
+
+commit e44e0429025ca234c8bed12f586f92485bca02a4
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Mon Oct 24 18:06:39 2022 +0300
+
+    Add the new cluster-template-lb.yaml file and release it
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit cdb7a4cfd3e7b9e4291c142045825eeaaf473382
+Merge: fd908e4 6a50320
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Oct 20 13:27:22 2022 -0700
+
+    Merge pull request #195 from fengye87/main
+    
+    Fix CRI_PATH var in template files
+
+commit fd908e4baa5553bdf6dd7707db1d37c4a504721b
+Merge: 622baf9 3967130
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Oct 19 05:51:03 2022 -0700
+
+    Merge pull request #188 from qinqon/radim-quique-collab
+    
+    owners: Add Quique as owners to some sub directories
+
+commit 3967130045e5034d40bed7d469e4d906c42d59da
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Fri Sep 30 10:07:31 2022 +0200
+
+    owners: Add Quique
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit 622baf93517c8d6ddb5c36e8ed971265e30c750a
+Merge: 0dac7c2 1b45e02
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Oct 18 08:21:21 2022 -0700
+
+    Merge pull request #182 from rushyrush/main
+    
+    minor docs correction
+
+commit 0dac7c2482d32e0d9cdb1d0bc024c0e6b5ce591f
+Merge: 4c88701 8b5a2b6
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Oct 17 20:51:18 2022 -0700
+
+    Merge pull request #194 from davidvossel/update-e2e-to-k8s1.23
+    
+    update e2e to k8s 1.23.10 guest clusters
+
+commit 8b5a2b6434e17980a36d57c200731533610ea8dc
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Oct 7 10:23:55 2022 -0400
+
+    update e2e to k8s 1.23.10 guest clusters
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 4c887013cef47b18702756b0d2ac0a3a84ee193d
+Merge: a87d152 3204b1f
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sun Oct 16 22:59:06 2022 -0700
+
+    Merge pull request #196 from kubernetes-sigs/revert-183-passt_binding
+    
+    Revert "Add passt template"
+
+commit 3204b1f60c3bc9b52f76c9c43cc0c85046bfd524
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Oct 14 10:57:32 2022 -0400
+
+    Revert "Add passt template"
+
+commit a87d15241579d7a76a6247e84956b68d61dda9d5
+Merge: 57f35c3 eeab646
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Oct 14 07:54:47 2022 -0700
+
+    Merge pull request #191 from qinqon/kubevirtci-call-fetch-when-necessary
+    
+    kubevirtci: Refactor fetch mechanism
+
+commit 57f35c3b0726bf0e38a54f30d816e290f806e21e
+Merge: bc265c6 6b52ac1
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Oct 14 06:44:47 2022 -0700
+
+    Merge pull request #183 from rhrazdil/passt_binding
+    
+    Add passt template
+
+commit 6b52ac1356fb3daeb810687d86c7ccc63732f50a
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Tue Oct 4 12:44:27 2022 +0200
+
+    templates,persistent-storage: configure static mac address
+    
+    Without having static mac address, the VMIs with persistent storage
+    fail to get the same IP address after a reboot.
+    See https://github.com/kubevirt/kubevirt/issues/6410 for reference
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit eef8e522dcf5766ccff794c2baf1cc3be7366d5c
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Mon Sep 26 15:21:39 2022 +0200
+
+    kubevirtci,passt: apply recommended config to infra nodes
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit 3bb481b9b38a24439453a58b92216d4b6bb3c4a6
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Thu Sep 22 15:27:46 2022 +0200
+
+    kubevirtci: add CAPK_TEMPLATE env variable
+    
+    So the template can be easily chosen by setting an env variable
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit 37dfe775c5c53d269752e4c3cb8f4f6bdf0ab916
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Thu Sep 22 15:24:50 2022 +0200
+
+    passt: enable Passt featureGate
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit d04a7dadf265d2631c1beb044caa72f87036bbba
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Thu Sep 22 15:20:40 2022 +0200
+
+    passt: add template with tenant nodes using passt
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit 3efa36fde19fc89343bfd2631dbe33f52d3988b4
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Thu Sep 22 10:49:05 2022 +0200
+
+    bump kubevirt to v0.58.0
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit 6a503203bf5abad6f6e7fa77a9955d753a85db04
+Author: Feng Ye <yefeng@smartx.com>
+Date:   Wed Oct 12 15:09:53 2022 +0800
+
+    Fix CRI_PATH var in template files
+
+commit eeab6464351cde302af186e847dd5bb18a86adc6
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Wed Oct 5 10:23:19 2022 +0200
+
+    kubevirtci: Refactor fetch mechanism
+    
+    Everytime kubevirtci is call a fetch is run this is totally unnecesary
+    and somtimes it fails, this change refactor the fetch to do it when
+    necessary and also move the kubevirtci cloned path to .kubevirtci.
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit bc265c633a5b7a16782255db301d2093ab800957
+Merge: 586d578 f7bfd29
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Sep 29 13:48:39 2022 -0700
+
+    Merge pull request #187 from qinqon/check-make-generate
+    
+    ci: Check make generate has being call
+
+commit f7bfd29ad0336c840400695c38ac5eb973197966
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Thu Sep 29 13:49:43 2022 +0200
+
+    ci: Check make generate has being call
+    
+    Not pushing generated artifacts is a big issue. This change add a
+    check-gen make target and a sigthub action with it.
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit 586d578d8790c3ff91c9192936fb5a20cf64b9ff
+Merge: 03d6f01 273c6c5
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Sep 28 09:10:34 2022 -0700
+
+    Merge pull request #186 from qinqon/update-kubevirtci-guest-image-k8s-1.23
+    
+    kubevirtci: Update guest image to have console
+
+commit 273c6c5c2d05f02e2cde28ca40c9b1a524d2eae8
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Wed Sep 28 16:23:11 2022 +0200
+
+    kubevirtci: Update guest image to have console
+    
+    The ubuntu image was missing the console kernel params to be able to use
+    virtctl console with it. This change use image-builder [1] to create a
+    k8s-1.23.10 ubuntu image with console activated.
+    
+    [1] https://github.com/kubernetes-sigs/image-builder/pull/984
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit 03d6f013b1309fada53ffd3276532f52f8b03199
+Merge: dc0cebc 7e02222
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Sep 22 09:39:05 2022 -0700
+
+    Merge pull request #168 from qinqon/poc-cloud-provider
+    
+    template: Add kccm flavor
+
+commit 7e0222240f425dee1f25e839c243ea690c177493
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Thu Aug 4 10:04:54 2022 +0200
+
+    kccm: Create tool to generate kccm flavors
+    
+    The clusterctl tool has a "--flavor" using this a cluster with
+    cloud-provider-kubevirt integrated can be created doing:
+    
+    cluterctl generate cluster --infrastructure kubevirt --flavor kccm
+    
+    This change create at tool to generate those flavors from a
+    cloud-provider-kubevirt repository.
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit 1b45e02b47e1e20ee7fac89228a76a9f7c39f5f5
+Author: rushyrush <rush.evan@gmail.com>
+Date:   Wed Sep 21 09:46:44 2022 -0600
+
+    minor docs correction
+
+commit dc0cebc612cc0dcfeb37fe29749b8ea6123b27a9
+Merge: 9d57dc9 e882100
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sat Sep 17 04:18:30 2022 -0700
+
+    Merge pull request #176 from davidvossel/fix-secret-reconcile
+    
+    Fix unnecessary double write to ssh key secret
+
+commit 9d57dc958dd8e0d41e32f47760f294a688e5c284
+Merge: a9938fa b5c0085
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Sep 8 01:38:06 2022 -0700
+
+    Merge pull request #180 from qinqon/test-artifacts-fix-dump-version
+    
+    tests, artifacts: Fix the version to dl kv dump
+
+commit b5c008529a196af347be5e82a8aae6b502688668
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Thu Sep 8 10:20:05 2022 +0200
+
+    tests, artifacts: Fix the version to dl kv dump
+    
+    The variable used to pass the kubevirt version to the dump URL was
+    wrong, this change fix that.
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit a9938fa155360086cd1d33dd36e3d3f1b11dea5c
+Merge: 09e50a0 725371a
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Aug 31 12:13:06 2022 -0700
+
+    Merge pull request #177 from nunnatsa/add-file-to-release
+    
+    Add the cluster-template.yaml file to the relrase assets
+
+commit 725371a0898a1928490eb85cf7c86bea35fedab4
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Wed Aug 31 17:06:40 2022 +0300
+
+    Add the cluster-template.yaml file to the relrase assets
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit e8821007d999dadd091bb708330020a2873b0ba4
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Mon Aug 29 16:07:39 2022 -0400
+
+    Fix unnecessary double write to ssh key secret
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 09e50a0d19bf32b41359edaf29ce91dc6550ef40
+Merge: 4391642 13f0884
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Aug 25 12:48:08 2022 -0700
+
+    Merge pull request #174 from jbpratt/publish-multi-arch-manifest
+    
+    build and publish multi-arch image manifest
+
+commit 13f0884ac042d80ac51c586629073a4bbb7a82d6
+Author: jbpratt <jbpratt78@gmail.com>
+Date:   Tue Aug 23 17:02:28 2022 -0500
+
+    build and publish multi-arch image manifest
+    
+    Run the make targets to build and publish the multi-arch images and
+    manifest, updating the image kustomized into the manager deployment to
+    be the manifest.
+    
+    Signed-off-by: jbpratt <jbpratt78@gmail.com>
+
+commit 43916429f4417c3b18ded7052768e5fb4265c0a6
+Merge: 48146e1 5ff4ba0
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Aug 19 05:53:52 2022 -0700
+
+    Merge pull request #166 from rhrazdil/e2e_sonobuoy_conformance
+    
+    e2e: sonobuoy conformance tests
+
+commit 5ff4ba0cf9eac83901a0340756f923d079e9c473
+Author: Radim Hrazdil <rhrazdil@redhat.com>
+Date:   Fri Aug 5 12:52:16 2022 +0200
+
+    e2e, conformance: introduce conformance tests
+    
+    Conformance tests are executed with sonobuoy, which
+    run from a pod deployed in infra cluster.
+    
+    The conformance e2e tests themselve are running in
+    the tenant cluster.
+    The pod mounts the tenant cluster kubeconfig
+    from the <cluster-name>-kubeconfig secret.
+    
+    The run-conformance.sh script creates a configMap
+    with names of tests that need to be skipped due to
+    issues with DNS (accessing services via internal
+    domain name) in the guest cluster.
+    
+    Signed-off-by: Radim Hrazdil <rhrazdil@redhat.com>
+
+commit 48146e1c41d730c13e159b11d147c9f0f42361e6
+Merge: 2b08d6d 05f7f2e
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Aug 9 10:26:36 2022 -0700
+
+    Merge pull request #171 from isaacdorfman/update_clusterctl_metadata_version
+    
+    Updated metadata.yaml major version to 0 to fix clusterctl problem
+
+commit 05f7f2e0ef9b44a67f8af49284fd680c8bce9d27
+Author: Isaac Dorfman <idorfman@redhat.com>
+Date:   Tue Aug 9 17:20:07 2022 +0300
+
+    Updated metadata.yaml major version to 0 to fix clusterctl problem
+
+commit 2b08d6d56dafa0916352ef8dd00df62a98e135ee
+Merge: b604933 ae33230
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Aug 5 01:25:46 2022 -0700
+
+    Merge pull request #156 from qinqon/integrate-kubevirt-dump
+    
+    test, reporter: Integrate with kubevirt dump
+
+commit b60493361bf3dae57676c7711832252dc136ffd3
+Merge: 48c632e 657f075
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Aug 5 01:23:47 2022 -0700
+
+    Merge pull request #146 from qinqon/kubevirtci-add-curl-lb-namespace
+    
+    kubevirtci: Specify proper namespace for curl-lb
+
+commit 657f0755cb2368de238925ffb327cacd7a4c6ecb
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Mon Jul 4 16:09:27 2022 +0200
+
+    kubevirtci: Specify proper namespace for curl-lb
+    
+    The curl-lb probe is created at the service namespace but the kubectl
+    wait is done at default.
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit ae33230569cc137235f5a6e049194e8969d8261b
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Fri Jul 22 11:57:30 2022 +0200
+
+    test, reporter: Integrate with kubevirt dump
+    
+    The kubevirt project has a cmd to dump artifacts with the k8s reporter.
+    This changes creates a similar dump command integrated with the capk
+    deps, It will dump stuff at JustAfterEach it test fails.
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit 48c632eaf202b5a6eeb508ea559cd6d03293a248
+Merge: 5aa3a3d 8a5e0df
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Aug 3 07:41:53 2022 -0700
+
+    Merge pull request #145 from nunnatsa/drain-node
+    
+    Graceful deletion of a VirtualMachineInstance
+
+commit 8a5e0dfb46832a55a703596ca2cb4bac4dad756f
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Aug 2 12:12:19 2022 +0300
+
+    Fix code review comments
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 8c89b7c2c458d9435bca51bde8db16042dcdb67c
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Thu Jul 28 18:41:53 2022 +0300
+
+    fix bug in the vmi eviction controller - wrong predicate
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit d8b2b98c12f530e11001e73c9ce2ff8616db5565
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Jul 12 14:40:51 2022 +0300
+
+    Add VMI eviction functional test
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 210fd52c7a6cdcbd96f60593923ceb6e9095673c
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Mon Jul 11 14:45:15 2022 +0300
+
+    Drain node: add timeout
+    
+    If drain is failing for more than 10 minutes, delete the VMI anyway.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit b9d14c972c1c759bff545a0c590de47d27f3f8c1
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Mon Jul 4 10:49:34 2022 +0300
+
+    Apply code-review comments
+    
+    Also, add unit tests. Needed to changed the logic to get the guest
+    cluster client, to use the workloadClient type, because the previous
+    code was not testable.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 160f5dc75f6f4832a97523858661163264ea8729
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Thu Jun 30 09:20:10 2022 +0300
+
+    Graceful deletion of a VirtualMachineInstance
+    
+    When a host node is deleted, the guest VMIs are evicted, killing the
+    running tenant node in this VMI.
+    
+    This PR gracefully delete the VMI, by first drain the guest node. Only
+    if the drain successful, CAPK will delete the VMI.
+    
+    The PR is based on a feature in KubeVirt, where by setting the eviction
+    strategy to "external" KubeVirt will not delete the VMI, but will set
+    the `vmi.Status.EvacuationNodeName` field to signal to the external
+    controller (CAPK in this case) that the VMI should be evicted.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 5aa3a3d351970f31df0702ed499a764177518f1e
+Merge: f648582 a9e7e11
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Aug 1 09:14:28 2022 -0700
+
+    Merge pull request #167 from pjaton/fix-infra-secret-lookup
+    
+    Fix infra secret lookup so that it defaults to the namespace of the referencing resource
+
+commit f64858284612a4bdd9b9358d0d1af9761e966356
+Merge: 58dcd70 528668f
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Aug 1 07:30:29 2022 -0700
+
+    Merge pull request #164 from pjaton/add-secret-labels
+    
+    Copy Kubeadm userdata secret labels to CAPK secret.
+
+commit a9e7e115a5c04c4be7903be4da5ae0bfd7fdb0a4
+Author: pjaton <patrice@4gates.org>
+Date:   Mon Aug 1 06:18:44 2022 -0700
+
+    Look for the infrastructure secret in the owner namespace by default.
+    
+    Also, add unit-test for the infracluster package.
+
+commit abde9dd09f4a9c93041f74c4510c497365c383c1
+Author: pjaton <patrice@4gates.org>
+Date:   Mon Aug 1 06:18:16 2022 -0700
+
+    Refactor setup-scheme into shared functions.
+
+commit 58dcd707d39d772ac87918cb3d580f9c78f0b738
+Merge: fe229f7 46a88fa
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Jul 29 14:07:11 2022 -0700
+
+    Merge pull request #159 from pjaton/fix-capk-user-add
+    
+    Add capk user properly when users already defined.
+
+commit 528668f3ab311adff6816154d623573039078a2d
+Author: pjaton <patrice@4gates.org>
+Date:   Thu Jul 28 06:05:36 2022 -0700
+
+    Use gomega matcher to check labels
+
+commit fe229f76cccfd528142636857662622a894523ec
+Merge: a8097c4 7229ee4
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Jul 28 01:59:10 2022 -0700
+
+    Merge pull request #154 from qinqon/wait-for-tenant
+    
+    kubevirtci: Wait for cluster and calico
+
+commit ab5ec822412a093702d6e71a01abb58ac07e207b
+Author: pjaton <patrice@4gates.org>
+Date:   Tue Jul 26 14:03:22 2022 -0700
+
+    Copy Kubeadm userdata secret labels to CAPK secret.
+
+commit 7229ee49f4359f7f1ccf668fd7ec726a31c618d7
+Author: Enrique Llorente <ellorent@redhat.com>
+Date:   Thu Jul 21 10:22:03 2022 +0200
+
+    kubevirtci: Wait for cluster and calico
+    
+    Some guards are missing from kubevirtci script, this change add them:
+    - Wait for cluster readiness after creation
+    - Wait for vms readiness
+    - Wait for calico node pod readiness
+    - Wait for tenant node readiness
+    
+    Signed-off-by: Enrique Llorente <ellorent@redhat.com>
+
+commit a8097c471d38aabe38179cd187a4d95618a834d2
+Merge: 1aeca51 a167f93
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Jul 26 13:09:09 2022 -0700
+
+    Merge pull request #160 from pjaton/fix-namespace-logic
+    
+    Select kubeconfig current context namespace before 'default'.
+
+commit a167f931bc9c8925c2fbc914f994f33fbcd61614
+Author: pjaton <patrice@4gates.org>
+Date:   Mon Jul 25 06:21:57 2022 -0700
+
+    Select kubeconfig current context namespace before 'default'.
+    
+    Update the logic resolving the infrastructure namespace to use the
+    namespace of the current context, if any, in the kubeconfig before
+    defaulting to the 'default' namespace.
+
+commit 46a88fa2a3d40bccd41f707a67442ee4613e3ef6
+Author: pjaton <patrice@4gates.org>
+Date:   Mon Jul 25 06:10:13 2022 -0700
+
+    Add capk user properly when users already defined.
+    
+    This change takes into account the case where the user configured
+    additional users already, including the case when a capk user is already
+    added.
+
+commit 1aeca5160094199b11ea955d41247962ed8fcae0
+Merge: 749147a 5528680
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Jul 25 07:08:34 2022 -0700
+
+    Merge pull request #157 from pjaton/fix-patch-of-deleted-failure
+    
+    Avoid reporting not-found errors when patching resources under deletion.
+
+commit 749147a3588ead9c426c50432f2d5af689c9aad1
+Merge: 821b0a8 f108640
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Jul 25 06:50:34 2022 -0700
+
+    Merge pull request #132 from agradouski/issue/90
+    
+    [e2e tests] Cover creating tenant clusters in external infra clusters in the integration tests
+
+commit 821b0a8f31782fe11d788bddaac40e3e8ee1ccf1
+Merge: 1dd6434 239dbcc
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Jul 25 06:24:34 2022 -0700
+
+    Merge pull request #151 from pjaton/fix-external-deletion
+    
+    Fix external deletion
+
+commit 5528680adad6b9f7915651a1e47f9572aff8676f
+Author: pjaton <patrice@4gates.org>
+Date:   Fri Jul 22 09:27:55 2022 -0700
+
+    Avoid reporting not-found errors when patching resources under deletion.
+    
+    It happens that the resources are already deleted by the time the
+    controller tries to patch them during reconcile-delete. In this case,
+    the code should be lenient and not report on not-found errors.
+
+commit 239dbcc7745da9c77159e173bd3f8ad3c6c6f184
+Author: pjaton <patrice@4gates.org>
+Date:   Tue Jul 19 13:15:52 2022 -0700
+
+    Search for external VM to delete in correct namespace.
+    
+    The previous logic always look in the KubeVirtMachine namespace for the
+    VM to delete instead of using the resolve infrastructure namespace.
+
+commit d6c15cf26999646e0e44aaad1a25b0c157c4e461
+Author: pjaton <patrice@4gates.org>
+Date:   Tue Jul 19 13:14:16 2022 -0700
+
+    Enable specifying namespace where VM and VMI are created.
+    
+    Also, add tests of VM deletion.
+
+commit f10864009872a596c01baf5d5aca31d5cd509a4d
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Fri Apr 15 14:36:55 2022 -0700
+
+    [e2e tests] Cover creating tenant clusters in external infra clusters in the integration tests
+
+commit 1dd643483079ba639de1ef7ceb61b792fc729995
+Merge: 41c77a7 cbc09ac
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Jul 22 16:28:56 2022 -0700
+
+    Merge pull request #155 from davidvossel/pin-kubevirt-release
+    
+    Unblock e2e CI tests
+
+commit cbc09acce08668779fb5c8cd3dc8f4cf3916c94b
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Jul 22 15:42:55 2022 -0400
+
+    Reduce memory usage by using local storage provider
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 33930bbe27893ce7dfc4fe6fb3a82ba637464c93
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Thu Jul 21 17:01:39 2022 -0400
+
+    Update to k8s 1.22 guest cluster image
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit d463f340402d21b7a372b72752d19a2f7f4e0780
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Thu Jul 21 13:03:40 2022 -0400
+
+    Pin kubevirtci to a kubevirt release to prevent CI regressions
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 41c77a793ccbcaa21a05d9b76fd2d4f02c4934f5
+Merge: 3fbdad9 cce88a0
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Jul 12 13:47:36 2022 -0700
+
+    Merge pull request #148 from davidvossel/revert-144-e2e-test-fix
+    
+    Revert "Fix flaky e2e test"
+
+commit cce88a057c5fab2135d308779230d0b0ef02cffd
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Jul 12 11:38:52 2022 -0400
+
+    Revert "Fix flaky e2e test"
+
+commit 3fbdad97b90f6dd4cc691a213f2d86f992d39937
+Merge: 7bc78d3 d534fcb
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Jun 29 09:50:06 2022 -0700
+
+    Merge pull request #144 from davidvossel/e2e-test-fix
+    
+    Fix flaky e2e test
+
+commit d534fcb93ceaa63b6e437f191c29a0c375d6a4c8
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Jun 29 12:35:38 2022 -0400
+
+    Fix flaky e2e test
+    
+    The test occasionally failed because the Update() vmi call
+    returned an err. This err occurred because the vmi would mutate
+    between the Get and Update calls. To fix this, we use a Patch
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 7bc78d31ddaad7f2d357c04bd770570ff78d8fa2
+Merge: 3457e8e 7c2ee63
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Jun 8 19:39:42 2022 -0700
+
+    Merge pull request #143 from davidvossel/network-fixes
+    
+    Network fixes
+
+commit 7c2ee63569d039bbff60d4e5a60a717819ac7c1f
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Jun 1 14:13:42 2022 -0400
+
+    Install cni and verify pod/node status in e2e tests
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 7880b04a3adab6892239e20381f8756542ed43f4
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Jun 1 10:47:47 2022 -0400
+
+    offset tenant network settings from default infra kubeadm settings
+    
+    The domain and cidr ranges of the tenant cluster need to be offset
+    from the default kubeadm settings or else they will likely conflict
+    and overlap with the infra network's settings
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit a6e458474331f680e908e7a265a47c2982735bd2
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Jun 1 10:44:34 2022 -0400
+
+    add install calico to kubevirtci and update cluster-up git hash
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 3457e8e7d217e5622d0b29b281c25fc7b4008647
+Merge: 435fc16 62c6aae
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue May 31 14:21:24 2022 -0700
+
+    Merge pull request #139 from nirarg/e2e-test
+    
+    Add tenant cluster verification to create-cluster test
+
+commit 435fc16bdf9876fd8b799798f158edeab2db617d
+Merge: 4c4743d 138541e
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon May 30 11:36:52 2022 -0700
+
+    Merge pull request #141 from davidvossel/kubevirtci-metal-lb
+    
+    Kubevirtci metal lb support
+
+commit 138541efad28e4b1705e9a02febd5578c957e1f6
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Thu May 26 16:32:09 2022 -0400
+
+    Add kubevirtci function to clean local cache
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 80990677a2a0beeeed80f543ae5d5c72924b9775
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Thu May 26 16:03:26 2022 -0400
+
+    Add kubevirtci command to install capk from upstream release
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit f7062846a00d3d14f50eff487bbabc91e061b83e
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Thu May 26 13:01:10 2022 -0400
+
+    Adds command to curl a load balancer within infra cluster
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit c6207576b42f2275f7d2e8e3722cb6826fccd98e
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Thu May 26 12:24:46 2022 -0400
+
+    Add kubevirtci option for installing metallb
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 62c6aae698496a5e9e96d58697ac8c0e17581d65
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Tue May 17 14:19:53 2022 +0300
+
+    Add tenant cluster verification to createcluster test
+    
+    Add the ability to access the tenant cluster during the test
+    Currently checking only the Nodes exist, need to add more functionality
+    (For example adding new operators/workloads using the network and storage)
+    In order to have this ability, added the following:
+    1. Using virtctl client for kubevirt resources
+    2. Performing Virtctl portforward and modifying the tenant cluster
+       kubeconfig
+
+commit 4c4743db82f5e5ed3a74a1e807a5db9d3b5e33d2
+Merge: 27cedcf 60a0162
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed May 25 23:05:23 2022 -0700
+
+    Merge pull request #140 from davidvossel/kubevirtci-updates
+    
+    Kubevirtci updates
+
+commit 60a0162cc8f9a1f9dbdd17c2ab61eeb0fba3637c
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed May 25 16:42:16 2022 -0400
+
+    make separate kubevirtci command for simulating external clusters
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit f01885dc9eb2b58a6c26c96fd7f43478d5574cfb
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed May 25 16:13:42 2022 -0400
+
+    add kubevirtci destroy-cluster command
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 0857b5fd51fd2314922b2470db8fef9879dd4e5e
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed May 25 15:43:51 2022 -0400
+
+    Add ssh commands for infra and tenant nodes
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit ed7eb9e9f5e039c6529b629c5060adf8e0ce4cde
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed May 25 15:06:05 2022 -0400
+
+    Add namespace to kubectl-tenant command
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 27cedcf60090763cd8630c6e44b953920bb7306c
+Merge: a6326da c5b9ccc
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue May 24 13:07:23 2022 -0700
+
+    Merge pull request #133 from nirarg/kubevirtci-tenant-access
+    
+    kubevirtci: Add option to interact with the tenant cluster and improve usage (help)
+
+commit a6326da5345df60d33eb0244cd904a76c141b994
+Merge: 682b649 cf80b5a
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu May 12 06:25:15 2022 -0700
+
+    Merge pull request #136 from nunnatsa/move-to-go-1.18
+    
+    Move to golang 1.18
+
+commit cf80b5aba2674a4d252abfc232c02baf606b1141
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Thu May 12 08:45:35 2022 +0300
+
+    Move to golang 1.18
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 682b649ef9784b99db9ef31803c4c4b92348b8f3
+Merge: 879a4cb 93595d8
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue May 10 08:17:43 2022 -0700
+
+    Merge pull request #135 from isaacdorfman/image-builder-docs
+    
+    added docs for creating the image-builder image
+
+commit 879a4cb01ec526aa2241d1099f86faa23acf6857
+Merge: f89a85c 7f597e1
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue May 10 07:51:44 2022 -0700
+
+    Merge pull request #113 from isaacdorfman/clusterctl-integration
+    
+    Clusterctl integration
+
+commit 7f597e1cff22843691817bf88c77e1495f18ef0d
+Author: Isaac Dorfman <idorfman@redhat.com>
+Date:   Tue May 10 17:08:25 2022 +0300
+
+    Fixed a linting problem
+
+commit e5c71d00289bf2cbad41b2dbff084ecadb72be24
+Author: Isaac Dorfman <idorfman@redhat.com>
+Date:   Tue May 10 17:08:19 2022 +0300
+
+    clusterctl integration
+
+commit 93595d8f92d29838e96a0f3229388e8c2e32d82f
+Author: Isaac Dorfman <idorfman@redhat.com>
+Date:   Tue May 3 18:07:31 2022 +0300
+
+    added docs for creating the image-builder image
+
+commit f89a85c1cdd9474f19ab578607a1fe9e8eb4d1b2
+Merge: 5850b33 fa1c7cf
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon May 2 01:33:14 2022 -0700
+
+    Merge pull request #134 from nunnatsa/debug-e2e
+    
+    Add failure printout to the e2e test RunCmd function
+
+commit fa1c7cf7d5b3996cb82a950984eaa437bcc809f6
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Mon May 2 09:09:46 2022 +0300
+
+    Add failure printout to the e2e test RunCmd function
+    
+    In order to debug e2e test failures, add failure printout to the RunCmd
+    function, so we could understand what went wrong in case of a failure.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit c5b9ccc0c67c90b98d3fb50cc75abd0d8f3e421a
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Thu Apr 28 19:06:24 2022 +0300
+
+    kubevirtci: Add option to interact with the tenant cluster and improve usage (help)
+
+commit 5850b3372674503ece125659bbd671f5252a812d
+Merge: 7874a57 9d7d45d
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Apr 27 08:50:11 2022 -0700
+
+    Merge pull request #108 from isaacdorfman/image-builder-integration
+    
+    Added integration with the image-builder kubevirt image
+
+commit 9d7d45da12860abd95ad058a946ea28e0f9096d6
+Author: Isaac Dorfman <idorfman@redhat.com>
+Date:   Wed Apr 27 15:26:15 2022 +0300
+
+    added integration with the image-builder kubevirt image
+
+commit 7874a579c45894764b968c3b788fdc2a76192e1d
+Merge: 167006a 1346213
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Apr 14 14:07:10 2022 -0700
+
+    Merge pull request #131 from agradouski/refactor-e2e
+    
+    refactor e2e tests
+
+commit 134621305347b10549e0b9c05274eebbbd8a982c
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Wed Apr 13 15:19:14 2022 -0700
+
+    refactor e2e tests:
+    
+    - move all e2e code to e2e_test package
+    - consolidate logic and reduce number of files
+    - move required args validation to test suite initialization
+    - extract tenant cluster kubernetes version to env var
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit 167006ada52114a31e0cca0777a107451fa771e0
+Merge: 8eca681 2065d82
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Apr 12 16:22:47 2022 -0700
+
+    Merge pull request #130 from davidvossel/failure-reasons-v1
+    
+    MachineHealthCheck and node remediation integration
+
+commit 8eca681d09122d6208b84d5e4be3b60e4fb3026b
+Merge: e030c97 5016900
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Apr 11 00:48:07 2022 -0700
+
+    Merge pull request #129 from nirarg/clusterkubevirtadm-kubevirtci
+    
+    Change "kubevirtci create-cluster" command to use clusterkubevirtadm kubeconfig
+
+commit 5016900be2eca0f814be429fb2cbcf27b31efffc
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Tue Apr 5 16:25:19 2022 +0300
+
+    Change "./kubevirtci create-cluster" command to use clusterkubevirtadm kubeconfig
+    
+    This commit changes kubevirtci to behave like the tenant cluster is created on ext infra
+    This is done in order to test the cluster creation with clusterkubevirtadm limited kubeconfig
+    This will also allow us to follow another resources would be added in the future to the tenant cluster creation
+    Notice: added special behavior for kubevirtci, in which the "localhost" IP in the kubeconfig is replaced
+    with the controlplane VM IP, in order to allow using the kubeconfig inside the cluster
+
+commit 2065d825c3d4115abc973a7b808497a2d1151eec
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Apr 5 17:05:30 2022 -0400
+
+    Add e2e test for MHC and FailureReason processing
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit ac2b012db4a9ea48b6bebd4a97e4291520254d25
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Apr 1 17:21:56 2022 -0400
+
+    Unit tests to detect terminal state
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit b8f770ad22ec4d20febe70142073b022535e4fce
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Apr 1 17:20:08 2022 -0400
+
+    Set FailureReason on KubeVirtMachine when terminal state is encountered
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit ae3de67b9d8942b1d5f977d03939c07fc60407c9
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Apr 1 17:19:25 2022 -0400
+
+    Update KubeVirt API mod dependency to pick up new fields
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit e030c972664a14e9f1731d14f3fc38facb4c0cb7
+Merge: 81d966c d767317
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Apr 5 12:55:27 2022 -0700
+
+    Merge pull request #126 from agradouski/e2e-env
+    
+    refactor: move environment context out of e2e tests logic
+
+commit d7673178221a83ebc4f58562c6641f04178cf335
+Merge: 5fc4337 81d966c
+Author: Alexander Gradouski <73259059+agradouski@users.noreply.github.com>
+Date:   Tue Apr 5 11:30:16 2022 -0700
+
+    Merge branch 'main' into e2e-env
+
+commit 5fc433736357bc5f9478c6ffd634493bfb58e412
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Mon Apr 4 09:26:53 2022 -0700
+
+    rebase
+
+commit cc7a4f1c397d54b3168400f506c8be1a514db889
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Mon Apr 4 16:36:51 2022 -0400
+
+    rebase
+
+commit 5931818884646f2ebf580648e850ab57ad5d680b
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Wed Mar 16 15:09:54 2022 +0200
+
+    tiny change to trigger e2e test
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 7070ec18e5e2a6b4dbd70b3c0fb26daa272e241c
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Mar 15 17:39:20 2022 +0200
+
+    add printout to e2e, to check the golang version
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit e8822db3c65e6b36d834a4f25e621de4417006bc
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Tue Apr 5 12:30:52 2022 +0300
+
+    Add More permissions to clusterkubevirtadm Role
+    
+    The capk user need also permissions for the following resources
+    In order to create the tenant cluster
+    * virtualmachineinstances
+    * secrets
+    * services
+
+commit 81d966cbddfaa2951c0fe3a4b19fad2204d8e2f9
+Merge: 62cea32 c354cf1
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Apr 5 11:17:37 2022 -0700
+
+    Merge pull request #127 from davidvossel/switch-to-rook-storage-class
+    
+    Switch to using rook-ceph for e2e storage class
+
+commit 62cea3229ecd84119742c6cae1b5475ebf4310df
+Merge: e01e18d 12d5e52
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Apr 5 08:05:38 2022 -0700
+
+    Merge pull request #114 from nunnatsa/fix-e2e-test
+    
+    Fix the ginkgo dependencies to match v2
+
+commit e01e18de69896d001d3bdb42da74f14c6b34d94b
+Merge: ac59574 5b655a3
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Apr 5 05:07:37 2022 -0700
+
+    Merge pull request #128 from nirarg/clusterkubevirtadm-role
+    
+    Add More permissions to clusterkubevirtadm Role
+
+commit 5b655a36dc7dc58fd551e89ff241a04762e2e29f
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Tue Apr 5 12:30:52 2022 +0300
+
+    Add More permissions to clusterkubevirtadm Role
+    
+    The capk user need also permissions for the following resources
+    In order to create the tenant cluster
+    * virtualmachineinstances
+    * secrets
+    * services
+
+commit c354cf1dc0fae51ce9e95416507772404e1c4140
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Mon Apr 4 16:36:51 2022 -0400
+
+    Switch to using rook-ceph for e2e storage class
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 24f3704eb11554c70b886b94c11a50d424d53411
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Mon Apr 4 09:26:53 2022 -0700
+
+    refactor: move environment context out of e2e tests logic
+
+commit ac59574e3119dcf19f11d700dd8396f569372f2c
+Merge: 739ac36 44fc5c4
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Mar 29 23:50:25 2022 -0700
+
+    Merge pull request #125 from nunnatsa/fix-e2e-test-lane
+    
+    Restore the E2E test to not use clusterkubevirtadm
+
+commit 44fc5c4922b949e24f71dc73c31ad404b890af48
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Wed Mar 30 09:28:29 2022 +0300
+
+    Restore the E2E test to not use clusterkubevirtadm
+    
+    This is not working for now, and fails the E2E test lane.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 739ac3615316ebf9dccfbae0840f4326ef073f59
+Merge: 0e0271b ccd6e43
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Mar 29 08:06:49 2022 -0700
+
+    Merge pull request #123 from nirarg/clusterkubevirtadm
+    
+    Change clusterkubevirtadm to use --kubeconfig flag
+
+commit ccd6e430424640bcb09e8e0e458e043a6a09d2da
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Tue Mar 29 17:38:03 2022 +0300
+
+    Change clusterkubevirtadm to use --kubeconfig flag
+
+commit 0e0271b6d6020e88d22afd790a18694f41e5a59a
+Merge: 94808f8 b70c5ca
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Mar 29 06:02:47 2022 -0700
+
+    Merge pull request #122 from nirarg/clusterkubevirtadm
+    
+    Fix clusterkubevirtadm-linux-amd64 calling from e2e cluster creation workflow
+
+commit b70c5ca57d1137d41a3630fe9fdf70cd3b648f50
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Tue Mar 29 15:44:29 2022 +0300
+
+    Fix clusterkubevirtadm-linux-amd64 calling from e2e cluster creation workflow
+
+commit 94808f836cee565f0630c99b5d2da4119b69685e
+Merge: 82d4736 a36c773
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Mar 29 05:30:46 2022 -0700
+
+    Merge pull request #121 from isaacdorfman/clusterkubevirtadm-fix
+    
+    clusterkubevirtadm-fix 2
+
+commit a36c7730039a895f65cf4cc93f9a2953463c4784
+Author: Isaac Dorfman <idorfman@redhat.com>
+Date:   Tue Mar 29 15:12:17 2022 +0300
+
+    clusterkubevirtadm-fix 2
+
+commit 82d4736497e58bcba3e405d11af248e369963e46
+Merge: 7d91fc3 6769e5e
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Mar 29 04:14:48 2022 -0700
+
+    Merge pull request #120 from isaacdorfman/clusterkubevirtadm-fix
+    
+    This PR is a hotfix for the broken CI, it fixes a typo in the e2e workflow
+
+commit 6769e5e4afa2f997a70ac796d7307d2aac1d8b8a
+Author: Isaac Dorfman <idorfman@redhat.com>
+Date:   Tue Mar 29 13:56:16 2022 +0300
+
+    clusterkubevirtadm-fix
+
+commit 7d91fc3db849e27de75e1a3949f93cd0c077b04f
+Merge: 0d6d351 7047203
+Author: Alexander Gradouski <73259059+agradouski@users.noreply.github.com>
+Date:   Mon Mar 28 10:32:37 2022 -0700
+
+    Merge pull request #119 from nunnatsa/fix-e2e-test-go
+    
+    Add missing go compiler to the e2e test
+
+commit 0d6d351529f9fab2cc125a98c3a4eae1095b3524
+Merge: 00d4123 4cf5f59
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Mar 28 05:02:09 2022 -0700
+
+    Merge pull request #118 from nunnatsa/add-nahshon-to-owners
+    
+    Add nunnatsa to the approvers list
+
+commit 70472036b2386e7182b9ef6ad6b962fe9e3f08e9
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Mon Mar 28 13:17:33 2022 +0300
+
+    add missing go compiler to the e2e test
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 00d4123495ddabd33734bc4f53e1b9961ed12432
+Merge: ec9b80f 79a28d6
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sun Mar 27 11:53:22 2022 -0700
+
+    Merge pull request #111 from nunnatsa/clusterkubevirtadm
+    
+    Added new CLI named clusterkubevirtadm, to manage the infra cluster
+
+commit 4cf5f594f0b43308b5454d140bd94934a4b6611e
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Sun Mar 27 15:46:20 2022 +0300
+
+    Add nunnatsa to the approvers list
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 79a28d6a0be18b48bc37e5cdd1cd0de0e10e897f
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Thu Mar 24 17:44:59 2022 +0200
+
+    Added new CLI named clusterkubevirtadm, to manage the infra cluster
+    
+    Added a new CLI tool to manage the infra cluster. For now, the tool supports two commands:
+    
+    1. `clusterkubevirtadm create credentials`
+       this command creates a namespace, serviceAccount, role and roleBinding in the infra cluster.
+    2. `clusterkubevirtadm apply credentials`
+       this command creates or updatea namespace, serviceAccount, role and roleBinding in the infra cluster.
+    3. `clusterkubevirtadm get kubeconfig`
+       this command generates a kubeconfig file to use the serviceAccount created with the first command.
+    
+    The build the new tool, use:
+    * `make clusterkubevirtadm-linux` - for linux application
+    * `make clusterkubevirtadm-macos` - for macOS application
+    * `make clusterkubevirtadm-win` - for windows application
+    * `make clusterkubevirtadm-all` - for all the above + run the unit tests
+    * `make clusterkubevirtadm-test` - to run the unit tests
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit ec9b80fa7edf9356204300e2625c884c18ec5045
+Merge: 29dd04a d9f57d9
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Mar 23 02:56:01 2022 -0700
+
+    Merge pull request #117 from nirarg/approvers
+    
+    Add nirarg to the approvers list
+
+commit d9f57d9df2ef59aa7eca87a19d7f2e25d593ce87
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Tue Mar 22 17:28:34 2022 +0200
+
+    Add nirarg to the approvers list
+
+commit 29dd04a6c4087a614415c04787724056fa1356ff
+Merge: e456a27 93fa3b2
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Mar 16 11:52:10 2022 -0700
+
+    Merge pull request #116 from davidvossel/fix-external-managed
+    
+    Fix external managed kubevirt clusters don't get a finalizer
+
+commit 93fa3b2b3dfd416f2f84043c85e6a2f022e1e3a0
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Mar 16 13:19:30 2022 -0400
+
+    Add e2e test to ensure finalizer isn't added for external clusters
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 51202f7f41dacf45b955d52377396e601946301e
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Mar 16 13:17:00 2022 -0400
+
+    ensure we never reconcile an externally managed kvcluster
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 12d5e52b58144d6a0469e5c5a30c7ff225a644cd
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Wed Mar 16 15:09:54 2022 +0200
+
+    tiny change to trigger e2e test
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 12b18e29267996ec028f61a0b0d8723fef0a7d3b
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Mar 15 17:39:20 2022 +0200
+
+    add printout to e2e, to check the golang version
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit e456a2756ec24d751ce46c96254863b92ff7289f
+Merge: ef87d13 c989b8c
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Mar 15 08:30:10 2022 -0700
+
+    Merge pull request #112 from 0xFelix/patch-1
+    
+    Fix typo in kubevirtci::fetch_kubevirtci
+
+commit 09da20fdab19bb8feaad86b560d95fc7ef5a20ac
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Mar 15 15:43:38 2022 +0200
+
+    Fix the ginkgo dependencies to match v2
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit c989b8c64686d3266094de5f9b8b4c9da752dfa4
+Author: Felix Matouschek <fmatouschek@redhat.com>
+Date:   Mon Mar 14 17:13:17 2022 +0100
+
+    Fix typo in kubevirtci::fetch_kubevirtci
+    
+    KUEVIRTCI_TAG --> KUBEVIRTCI_TAG
+    
+    Signed-off-by: Felix Matouschek <fmatouschek@redhat.com>
+
+commit ef87d137a7b9a41e5facec5c4d62b2b879c912c7
+Merge: 0066428 905ff15
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Mar 9 10:00:13 2022 -0800
+
+    Merge pull request #109 from nunnatsa/move-to-ginkgov2
+    
+    Move to ginkgo v2
+
+commit 905ff1506faefe59458ffe65fe63d5b04b08e353
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Wed Mar 9 18:18:13 2022 +0200
+
+    Move to ginkgo v2
+    
+    Moving to ginkgo v2 allows filtering by labels.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 00664282b28fa22e9cf50f8340a3263c08ebef2e
+Merge: 3cf57f4 4c6c237
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Mar 8 22:48:21 2022 -0800
+
+    Merge pull request #102 from wangxin311/lb
+    
+    returen external IP address for loadbalancer
+
+commit 4c6c2377b17b908a08812a96beb00302e1b4c292
+Author: Xin Wang <kevin.w.xin@gmail.com>
+Date:   Tue Mar 8 22:18:08 2022 +0000
+
+    change from sleep timer to requeue
+
+commit 3cf57f4d26a81b8ef3c2dd0521e8f54f2b05fbc2
+Merge: af26149 c37c12d
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Feb 28 04:56:57 2022 -0800
+
+    Merge pull request #104 from nunnatsa/fix-unit-test
+    
+    Fix a unit test
+
+commit c37c12d85dae07caba5b6d08c00c713753935604
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Sun Feb 27 15:18:10 2022 +0200
+
+    Fix a unit test
+    
+    the "should ensure deletion of KubevirtMachine when bootstrap secret was never created" unit test is failed to be compiled.
+    
+    This PR fixes the mock expect call, so now the test is compiled, run and passed
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit e362695668045133074783877baa6b90f8b94887
+Author: Xin Wang <kevin.w.xin@gmail.com>
+Date:   Sat Feb 26 11:55:19 2022 -0800
+
+    Update comments for timer
+    
+    Wait 10 seconds for LoadBalancer to assign external IP after been created
+
+commit 8deb7b9713f3eafa5cc8d53491f05dfa3d4941a3
+Author: Xin Wang <kewang@equinix.com>
+Date:   Sat Feb 26 10:40:35 2022 +0000
+
+    returen external IP address for loadbalancer
+
+commit af261492fc33a45a47a9f5ab5b87b96822bc3995
+Merge: 8f4f016 7effa0e
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Feb 16 16:21:43 2022 -0800
+
+    Merge pull request #99 from davidvossel/issue-98
+    
+    Fixes KubeVirtMachine segfault during tear down
+
+commit 8f4f0163f3b4d478e5d244135966a9c2b2385eb9
+Merge: 40fa14e c074cfd
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Feb 16 16:19:43 2022 -0800
+
+    Merge pull request #93 from davidvossel/cluster-deletion-race
+    
+    Cluster deletion race
+
+commit 40fa14ed09916470353cacd1849a4c590fc0d484
+Merge: 9b28364 acfb062
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Feb 16 07:14:37 2022 -0800
+
+    Merge pull request #96 from isaacdorfman/issue-84
+    
+    Issue 84 - created image build and push workflow
+
+commit acfb0625b7218fe8a6b1359d1ed033516255ae5c
+Author: Isaac Dorfman <idorfman@redhat.com>
+Date:   Wed Feb 16 17:08:54 2022 +0200
+
+    added github workflow to build and push image
+
+commit 7effa0e109c5d5ff25d7e1b9a6939995e62b90d5
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Feb 15 16:59:34 2022 -0500
+
+    unit test verifies machine deletion works even if bootstrap secret is unknown
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit e0a3bec278f98617a2abe6a4ab35053ec9f9fc40
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Feb 15 16:59:06 2022 -0500
+
+    Fixes segfault during cluster delete when bootstrap secrets don't exist
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit c074cfd84127d16613603784dbaf5302217aca05
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Thu Feb 3 16:28:55 2022 -0500
+
+    e2e test that ensure teardown works independently of deletion ordering
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 261dc35281620ebbd4f4503af4381061f8ef976c
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Thu Feb 3 16:14:41 2022 -0500
+
+    unit tests verifying kubevirt machine can be deleted independently of cluster objects
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 78de9f38ced34d57f593c4f17d72fe2184453465
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Thu Feb 3 16:14:01 2022 -0500
+
+    Infra client is generated from kubevirt machine secret ref when set
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 70be0d828348c44d9b7742ab7cca4daead248ade
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Thu Feb 3 16:10:49 2022 -0500
+
+    Add infra secret ref as an option for kubevirt machines
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 9b2836499b51b0c49012bdb1b17f980578fbfd01
+Merge: ee414f2 a72d00a
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Feb 8 09:10:54 2022 -0800
+
+    Merge pull request #81 from isaacdorfman/units-tests
+    
+    Increase KubevirtMachine coverage
+
+commit a72d00a7e103627ac863b4c9a7f6521eb0a01baa
+Author: Isaac Dorfman <idorfman@redhat.com>
+Date:   Mon Feb 7 10:46:52 2022 +0200
+
+    Added unit tests for kubevirtmachine_controller
+
+commit 86615e2e99b96e5144ed0c2b1d826b44649e47ce
+Author: Isaac Dorfman <idorfman@redhat.com>
+Date:   Mon Feb 7 10:46:41 2022 +0200
+
+    extracted kubevirt.machine to an interface and replaced direct call to NewMachine with a MachineFactory interface
+
+commit ee414f21b1ff80322da2ddf597bfe98f52e34300
+Merge: 167a13a bc06912
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sun Feb 6 12:14:53 2022 -0800
+
+    Merge pull request #92 from wangxin311/servciecidr
+    
+    add serivce cidr configuration in template
+
+commit bc06912c626126484f0b3e14610414f761964159
+Author: Xin Wang <kevin.w.xin@gmail.com>
+Date:   Thu Feb 3 18:18:07 2022 +0000
+
+    add serivce cidr in template
+
+commit 167a13af398b141a3fa57956fbc62aef309f2005
+Merge: c65f77c 28bd8fa
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Feb 3 06:47:45 2022 -0800
+
+    Merge pull request #83 from davidvossel/externally-managead-fix
+    
+    Do not wait for SSH keys if there is an external controller
+
+commit c65f77c2130d943866efb495cdc7eb795f116bc5
+Merge: 8d7bb3c e5408bd
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Feb 2 09:12:21 2022 -0800
+
+    Merge pull request #91 from davidvossel/append-owners
+    
+    Add davidvossel to approvers list
+
+commit e5408bd233d4018cf8432e3bce3ce8719cda8113
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Feb 2 12:03:11 2022 -0500
+
+    Add davidvossel to approvers list
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 28bd8faa1261b795c7cd496eeaddb9645d8a02da
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Feb 2 11:26:04 2022 -0500
+
+    Add workaround for clustercli issue https://github.com/kubernetes-sigs/cluster-api/issues/6051
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit be3488e8a621e0d5cdcb9aeb52ab205ad9db664e
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Feb 2 09:40:58 2022 -0500
+
+    run make sanity
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit f8aa69806f36340ac79e4eb0021c50723411eea6
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Feb 2 09:31:53 2022 -0500
+
+    Revise e2e test code style to conform to advanced gomega builtins
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 4ab1f58652bc2478ca0e921850cef7d6c15af1e1
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Feb 1 17:16:45 2022 -0500
+
+    Ensure node provider id is set
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 77ef2c15eb91a2484e244b49c3f8e460a03a626b
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Mon Jan 31 16:16:42 2022 -0500
+
+    E2e test to verify externally managed cluster
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 90a1197324c473a0d8068ae9eef1c135f8105a54
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Mon Jan 31 12:35:28 2022 -0500
+
+    Add unit test exercising exernal managed clusters
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 88d9dcde9703c925447e38a05d8dac1bb58489d6
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Mon Jan 31 12:30:33 2022 -0500
+
+    Handle ssh keys properly for externally managed clusters
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 8d7bb3c3755c0fa68d05fd37abd5c987f7d0cd3a
+Merge: a7f054e bf5d6c6
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Feb 2 02:02:22 2022 -0800
+
+    Merge pull request #80 from agradouski/issue/64
+    
+    expose cluster load balancer spec and metadata via KubevirtCluster resource
+
+commit bf5d6c66d6e3a4ce4c5b742c7a7b95120c2e5b8c
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Sun Jan 30 22:36:06 2022 -0800
+
+    expose cluster load balancer spec and metadata via KubevirtCluster resource
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit a7f054e9449f13b083d139ef2ac93d1d753beb46
+Merge: 7eedfc5 36312a9
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Feb 1 09:32:11 2022 -0800
+
+    Merge pull request #88 from nunnatsa/goimports
+    
+    Sort the imports and reformat all golang files
+
+commit 36312a99bfc51674d522e471dae361545155f36b
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Feb 1 14:56:40 2022 +0200
+
+    Run goimports as part of the sanity test
+    
+    run goimports to sort the imports in go files. goimports also performs gofmt.
+    
+    To make it work, this commit also contains the sorted files as well.
+    
+    This PR require a change in the way we're used to push PRs: it requires to make sure that the format of the files is valid before pushing the commits. For that, the PR also contain additions to the CONTRIBUTING.md file with the relevant instructions.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 7eedfc52b316fd6bca503311e2474f6e4698b889
+Merge: 972ba7f 0658cd9
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Feb 1 06:14:11 2022 -0800
+
+    Merge pull request #87 from nunnatsa/golinter
+    
+    Add go-linter to the github action
+
+commit 0658cd929a445e25180a2fc3f9e02f811c92c0ee
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Feb 1 13:13:44 2022 +0200
+
+    Add go-linter to the github action
+    
+    Fix all the golangci-linter warning (except for two deprecated function calls) and add the linter as a github action and a merge gate.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 972ba7f9b479a41551fcdbed22ff583d6040b6f5
+Merge: 6ec57de 40a0758
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Feb 1 05:34:18 2022 -0800
+
+    Merge pull request #86 from rmohr/test
+    
+    Pass the GOPROXY variable properly to docker
+
+commit 40a075848a69e80ee609e373479521c89c50b883
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Tue Feb 1 14:00:45 2022 +0100
+
+    Quote GOPROXY variable in the Makefile
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit 6ec57de19dcaaf4f63649c365627d242d8beb22f
+Merge: 621bca2 fdb4dbc
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sat Jan 29 11:34:23 2022 -0800
+
+    Merge pull request #79 from nunnatsa/fix-bug-kv-cluster-race
+    
+    Fix bug in KubevirtCluster Reconciler - endless reconcile loop with external controller
+
+commit 621bca203d67bbffafe6a5c8c15502ff585bd11b
+Merge: 5d5edb9 b725e10
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sat Jan 29 11:30:22 2022 -0800
+
+    Merge pull request #72 from dgovinndaraju12/controller-unit-tests
+    
+    Add unit test for Kubevirt Cluster Controller
+
+commit 5d5edb99e3670233fbe598d73d9a4bafbeddc2f3
+Merge: 4819782 62c12f4
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sat Jan 29 11:26:22 2022 -0800
+
+    Merge pull request #75 from wangxin311/lb
+    
+    fix issue #74
+
+commit fdb4dbcdba60adfa15c1880e752fc08623275fa6
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Thu Jan 27 22:03:47 2022 +0200
+
+    Fix bug in KubevirtCluster Reconciler - endless reconcile loop with external controller
+    
+    When the KubevirtCluster CR is manage by an external controller, sometimes there is an update race between capk and the external controller, where each update in one hand, triggers reconcile and update in the other hand and vice versa.
+    
+    This PR changes that so in this case, the CR is filtered out from the reconciling watch, and so capk will ignore changes made by an external controller.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 4819782b3bb31deec61cbf1ce30d3bf101d2c1d5
+Merge: cb69621 70020e2
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Jan 26 15:42:49 2022 -0800
+
+    Merge pull request #77 from kubernetes-sigs/add-approver-rmohr
+    
+    Add rmohr to the approvers list
+
+commit cb696210f178c749e776b7c6500bc1d7c44c39fc
+Merge: 4f0ae8d f9fbb81
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Jan 26 13:06:49 2022 -0800
+
+    Merge pull request #73 from davidvossel/persistent-vms
+    
+    Continually reconcile KubeVirtMachine objects
+
+commit 70020e2039a4f5ab6cfd18a0ac176d4accd2f616
+Author: Alexander Gradouski <73259059+agradouski@users.noreply.github.com>
+Date:   Tue Jan 25 08:51:42 2022 -0800
+
+    Add rmohr to the approvers list
+
+commit 4f0ae8d3038055af5a5e79983ba944b59658b060
+Merge: 86a9cdd 9a88028
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Jan 25 08:36:31 2022 -0800
+
+    Merge pull request #69 from agradouski/update-templates
+    
+    fix API versions in external infra template
+
+commit 62c12f45087b0bce3c9a08117ff0627bb2bddef5
+Author: Xin Wang <kevin.w.xin@gmail.com>
+Date:   Mon Jan 24 20:21:36 2022 +0000
+
+    fix issue #74
+
+commit f9fbb812c2c0764998cd2578465b1f3354d42478
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Jan 19 14:42:35 2022 -0500
+
+    Add namespace var to templates for VMs hosted on management cluster
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 0622335f80e8e00a6beba21451312acc5a65c61a
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Jan 19 13:37:18 2022 -0500
+
+    Add e2e test validating VMs with persistent storage
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 14b374493f29735bf8997094fa44bee5cfd205d8
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Jan 19 12:30:45 2022 -0500
+
+    Add template and ci for testing persistent storage vms
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 600162872db364af86da2de0d4667d39c4e8a69d
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Jan 19 11:52:12 2022 -0500
+
+    Unit tests to ensure VM and VMI are treated independently when determining if creation is necessary
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit dd64540ae30b6f9dda7fac9f4972b152ba703bd4
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Jan 19 11:51:38 2022 -0500
+
+    Should treat VM and VMI independently during reconcile creation flow
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 947fecbd303a6102eefecba3488bf1783e1cd915
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Jan 19 09:20:19 2022 -0500
+
+    Unit tests to detect when VMI is no longer ready
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 4778d9718cc8e45b19869a5136347b2620b983f1
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Jan 18 17:09:27 2022 -0500
+
+    Continually reconcile VMIs
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 86a9cdd7fb378fbe3e842ef0a8bbeacbed30f90a
+Merge: 3657f5d bad1ebb
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Jan 18 10:21:09 2022 -0800
+
+    Merge pull request #68 from agradouski/fix-issue-62
+    
+    make 0.1.x version of kubevirt provider compatible with 1.0.x version of cluster-api
+
+commit b725e10075fada44e0fb2d20c2d73c948fe41026
+Author: Divya G <dgovindaraju@apple.com>
+Date:   Tue Jan 18 10:10:46 2022 -0800
+
+    Add unit test for Kubevirt Cluster Controller
+
+commit 3657f5d7a5910858b19578085b1c563260524655
+Merge: 67dad9e 5d1ecb6
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Jan 18 08:57:09 2022 -0800
+
+    Merge pull request #71 from rmohr/ok-to-test-fix
+    
+    Run e2e test also on label events
+
+commit 5d1ecb640744902d8edf996b797b83ddfd6af94f
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Tue Jan 18 16:16:32 2022 +0100
+
+    Run e2e test also on label events
+    
+    Ensure that we react to a label change on the PR to ensure that the e2e
+    tests get triggered if someone writes /ok-to-test some time after the PR
+    got created.
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit 67dad9ed40789f5f473e1a823d59b59a48bdb37b
+Merge: be80dcc b5f7468
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Jan 13 21:48:28 2022 -0800
+
+    Merge pull request #67 from rmohr/mkpj-fail
+    
+    Add the new --fail-with-job flag to let mkpj fail when the prowjob fails
+
+commit 9a880287cf4062e60982031dc605e6acc6593e7d
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Thu Jan 13 21:40:27 2022 -0800
+
+    update template
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit bad1ebbabc8f9031569beefe32d25744ef356cbe
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Thu Jan 13 16:34:34 2022 -0800
+
+    0.1.x version of kubevirt provider is compatible with 1.0.x version of cluster-api
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit be80dcc0e964991c4ed331b0f6d08f97cfc61b77
+Merge: 287d88b afa904e
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Jan 13 07:04:30 2022 -0800
+
+    Merge pull request #66 from davidvossel/e2e-testsuite
+    
+    e2e ginkgo/gomega test suite
+
+commit b5f7468766a8608887fa0f0c20e55ddfb488432c
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Thu Jan 13 13:08:37 2022 +0100
+
+    Add the new --fail-with-job flag to let mkpj fail when the prowjob fails
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit afa904e42cd32c2f9340cd11d36d9dad09bc546d
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Jan 11 15:53:50 2022 -0500
+
+    Add comment and link to issue regarding cluster tear down in e2e test
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 3d093bf46f4bdec1fc848b549ce4086300a87eee
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Jan 11 15:33:29 2022 -0500
+
+    Wire e2e tests to functests.sh script for kubevirt ci
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 25baf6b2d0dd7f7651bcc0455d655284d3ce2146
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Jan 7 16:20:52 2022 -0500
+
+    Add simple cluster creation test to replace hack/functest.sh script
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 8284ae47150b1d9f30240bb3992e5064c63ed568
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Jan 7 15:54:57 2022 -0500
+
+    Auto download e2e test dependencies
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit d58cfc4799ef04e7ff430086c09ac1cc8874720e
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Jan 7 15:18:21 2022 -0500
+
+    Adds basic e2e test suite and makefile targets
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 287d88bfd43c3a3a2f643cc3d5d0a3ba0cb7634f
+Merge: 6aff381 6f82485
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Jan 4 08:14:52 2022 -0800
+
+    Merge pull request #59 from nunnatsa/add-coverage-file
+    
+    Create coverage file on unit test in CI
+
+commit 6f824851c63f8adcd96cf362b1eeb4be0b197b66
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Dec 21 13:07:35 2021 +0200
+
+    Create coverage file on unit test in CI
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 6aff381714e8ae9c01e58911b8a4f432e4ec839f
+Merge: 6a2ce8d f84fbce
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Dec 22 15:11:03 2021 -0800
+
+    Merge pull request #61 from davidvossel/vm-template-api
+    
+    Modify KubeVirtMachine API to include entire VM Template section
+
+commit f84fbce6847b64ec9828455a0235e8a0ed4ecb51
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Dec 22 11:31:51 2021 -0500
+
+    Add unit test to verify creation of VM's in custom namespaces
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 6067909da7a9fe3419ff9af1502a029f35e22c0c
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Dec 22 11:26:44 2021 -0500
+
+    When set, use the VMTemplates namespace when creating the VM
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 7d0e4162268a15829dd7e35ee6196b67f0f8e600
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Dec 22 11:09:12 2021 -0500
+
+    Unit test that verifys unique dataVolumeTemplates are generated per machine
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit a18259202212c139776658cdcc26409ce5e566c9
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Dec 22 09:52:07 2021 -0500
+
+    Adjust example templates for new api structure using vm templates
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 5d3c8a80be691be4642b622ac5b22cf106e7a147
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Dec 22 09:47:09 2021 -0500
+
+    Make DataVolumeTemplate values unique per vm
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 27a13cd3c20a2ec264bc3601592cd921cc14f11b
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Dec 21 22:04:15 2021 -0500
+
+    Adopt usage of VMTemplate within controllers and unit tests
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit a7d4f69046ace0ba84eb79b6b9bd41a0d3bc9649
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Dec 21 22:03:47 2021 -0500
+
+    Modify KubeVirtMachine to include entire VMTemplate within API
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 6a2ce8da5bf334ad06bdf03ba7ef0a3509a95d14
+Merge: fd3f9d2 fca9336
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Dec 22 07:05:36 2021 -0800
+
+    Merge pull request #58 from nunnatsa/test-machine-create
+    
+    Add unit tests for Machine.Create
+
+commit fd3f9d2f5ba4248f1e216b221bfde8d009ec96da
+Merge: a0804df e07656c
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Dec 22 02:51:35 2021 -0800
+
+    Merge pull request #57 from nunnatsa/limit-ci-repo
+    
+    Limit github action to run only on the kubernetes-sigs/cluster-api-provider-kubevirt repository
+
+commit fca933601d88ef0840dd2de98721a1425f71964a
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Dec 21 12:24:29 2021 +0200
+
+    Add unit tests for machine.Create
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit a0804dfeba174f8ce3dcf0dd0ef75a85ba5240c0
+Merge: 353694f 6468663
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Dec 21 20:23:35 2021 -0800
+
+    Merge pull request #50 from nirarg/versions-changes
+    
+    Versions changes
+
+commit e07656cbe235aa1ad564117ab32fe9b4321da3da
+Author: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+Date:   Tue Dec 21 09:48:05 2021 +0200
+
+    Limit github action to run only on the kubernetes-sigs/cluster-api-provider-kubevirt repository
+    
+    Add a condition to the github action, to prevent them to run on another repositories, like forks.
+    
+    Signed-off-by: Nahshon Unna-Tsameret <nunnatsa@redhat.com>
+
+commit 64686630542bbd704b809083dd5578315c99f816
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Thu Dec 16 12:02:22 2021 +0200
+
+    Versions change: "make generate" results
+
+commit 0849c35dd226b1b1f8e8ca6678f8821ca3f05dff
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Thu Dec 16 11:53:33 2021 +0200
+
+    Versions change: Go modules changes
+
+commit 15c9f57466301b6c115c382c1c4df64f66bd0126
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Wed Dec 15 11:35:28 2021 +0200
+
+    Versions change: Change Go version to 1.17
+
+commit d2f65fae96b9b005cba659bf778b327eadf3f02b
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Thu Dec 16 11:43:35 2021 +0200
+
+    Versions change: Change cluster-api version from v1alpha4 to v1beta1
+
+commit 353694f61daecb3e4c4ea78d13477a2fc209a4a5
+Merge: 5dfba0e 5328dad
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Dec 20 22:28:45 2021 -0800
+
+    Merge pull request #54 from nirarg/decrease_version_v1alpha1
+    
+    Versions change: Change api version to v1alpha1
+
+commit 5328dad7e4215d01a298aa80026054fcd0979e7a
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Wed Dec 15 11:01:31 2021 +0200
+
+    Versions change: Change api version to v1alpha1
+
+commit 5dfba0edea2d6b82e4904b988156372d2c32fc03
+Merge: 6886064 64bf9b7
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sun Dec 19 22:29:25 2021 -0800
+
+    Merge pull request #39 from agradouski/main
+    
+    Support for external infra clusters
+
+commit 64bf9b76931ce9ced10513c9ed60b625e599bfbd
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Sun Dec 19 22:12:47 2021 -0800
+
+    fix unit tests
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit 6886064e2dbcdb7eab843c8929b6387696c443b3
+Merge: 5a94245 ed6b197
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sun Dec 19 03:41:25 2021 -0800
+
+    Merge pull request #52 from aaseem/main
+    
+    Meetings Details update in README.md
+
+commit 5a942450cbd62126f14f5305847f0b08eedbc61c
+Merge: 2b9a3bd 0d74fd5
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sat Dec 18 21:39:24 2021 -0800
+
+    Merge pull request #53 from rmohr/integration-tests-no-external-golang
+    
+    Make integration tests independent of go version changes
+
+commit eecf38e4b4ad08cc99d94aa3219f1122dd053ce6
+Merge: 2365022 2b9a3bd
+Author: Alexander Gradouski <73259059+agradouski@users.noreply.github.com>
+Date:   Sat Dec 18 12:53:06 2021 -0800
+
+    Merge branch 'main' into main
+
+commit 236502285738ac7c35edc71e621cadc4351adac7
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Sat Dec 18 12:25:45 2021 -0800
+
+    rebase
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit 0d74fd553fa8a713bb7f117167521ffec6592f4a
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Fri Dec 17 10:43:48 2021 +0100
+
+    Give github actions better names
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit abb3433806071c856df7de172f2e6c8f53ef0d5e
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Fri Dec 17 09:44:57 2021 +0100
+
+    Make integration tests independent of go version changes
+    
+    With the new Dockerfile in place which builds the manager binary, the
+    binary does not have to be built upfront with the external golang
+    version. Instead the internal one can be used which makes for instance
+    integration jobs independent of the go versions installed there.
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit ed6b197f2bcf76d3d3a9c514d15ecbc120ae0a87
+Author: Sayyed Mohammad Aaseem <sayyed.aaseem@gmail.com>
+Date:   Fri Dec 17 08:21:17 2021 +0530
+
+    Update README.md
+
+commit 807b26c9b263595f6e008bb28f5452525e77aa4b
+Merge: 2f4bd06 2b9a3bd
+Author: Sayyed Mohammad Aaseem <sayyed.aaseem@gmail.com>
+Date:   Fri Dec 17 08:16:09 2021 +0530
+
+    Merge branch 'kubernetes-sigs:main' into main
+
+commit 2b9a3bd003372d31bc7985bd85f7f2a6dbcc670a
+Merge: 327d159 2a371d4
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Dec 16 17:48:28 2021 -0800
+
+    Merge pull request #44 from davidvossel/reconcile-tests-1
+    
+    Fixes "failed to create VM instance" error
+
+commit 327d1591d88d4c459eaf91fa4f974878fd8fc11f
+Merge: 09129f5 c1b5669
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Thu Dec 16 02:15:19 2021 -0800
+
+    Merge pull request #46 from cchengleo/update-dockerfile
+    
+    Add Dockerfile to build manager binary and emit production image
+
+commit 2a371d4a1e32a5fba95dcc2d3f8c2e802e1dad83
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Mon Dec 13 13:13:16 2021 -0500
+
+    remove race condition when searching for vmi immediately after vm creation
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit cf2189f576478d1593c50555e45efd1c93944d0d
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Mon Dec 13 13:12:07 2021 -0500
+
+    kubevirt machine reconcile normal unit tests
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 09129f5ed770d647d8eee7deabad149dbc77da17
+Merge: 55619c9 37a448c
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Wed Dec 15 03:26:19 2021 -0800
+
+    Merge pull request #49 from rmohr/make-secrets-available
+    
+    Make secrets for third-party PRs available
+
+commit 37a448ccf50474f34523d12db3505755588da35d
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Wed Dec 15 12:02:29 2021 +0100
+
+    Make secrets for third-party PRs available
+    
+    If a PR gets labeled with `ok-to-test` the integration test job is
+    triggered and this github action has access to secrets.
+    
+    The github action does for security resaons not allow secrets on all
+    PRs, so we add this extra step.
+    
+    Still, the action itself, while using a secret, does not have any
+    interaction points with users. The PR content is actually not even
+    checked out.
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit 55619c9c9f9ee2ed59267c77d548b1f2dc79718d
+Merge: 0c46a6b 7ebd2f5
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Dec 14 16:10:19 2021 -0800
+
+    Merge pull request #48 from PranshuSrivastava/meeting
+    
+    added meeting info to the README
+
+commit 7ebd2f570412d439bbe6e0ba9a4115aa8ed9d027
+Author: Pranshu Srivastava <iampranshu24@gmail.com>
+Date:   Tue Dec 14 23:47:19 2021 +0530
+
+    added meeting info to the README
+
+commit 0c46a6b0bcfe23437783475bb0efdf673a5aea4a
+Merge: defb61b bf8fd23
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Dec 14 09:15:47 2021 -0800
+
+    Merge pull request #38 from rmohr/testing
+    
+    Add unit- and functional test runners based on github actions
+
+commit c1b56692aa82cf08428d86caa56904cdd8caac3f
+Author: Cheng Cheng <chengcheng@apple.com>
+Date:   Tue Dec 14 21:21:54 2021 +0800
+
+    Add dockfile to build manager binary and emit production image
+
+commit defb61bb69f244102cfb91213e9f386d0f39f82a
+Merge: 2b5ff01 75bebc4
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Dec 14 01:10:04 2021 -0800
+
+    Merge pull request #43 from TheAbhishekS/abhishek1
+    
+    Update README.md
+
+commit 75bebc45f6d7125c3ace195943e01fd1c33f6d43
+Author: Abhishek sarkar <abhisheksarkar290@gmail.com>
+Date:   Mon Dec 13 20:45:51 2021 +0530
+
+    Update README.md
+
+commit 2b5ff01c6dc619a53003cd97d5f1440a68b53b09
+Merge: 6870e0a 9ab2197
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Dec 10 16:50:33 2021 -0800
+
+    Merge pull request #30 from davidvossel/cloud-init-fix
+    
+    Make ssh bootstrap detection optional
+
+commit 74fe54cfb4abfc2be449cc70b61cb25768d43739
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Fri Dec 10 15:19:54 2021 -0800
+
+    Support for external infra clusters:
+    
+    - return on errors, with retries
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit 9ab2197a3926f0d381ccc7071b4137828dcff2a3
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Dec 10 14:50:41 2021 -0500
+
+    Change IsBooted to IsReady in order to better reflect what is being checked
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 2f4bd065111c0926bd58588e891329e03db2d5f9
+Author: Sayyed Mohammad Aaseem <sayyed.aaseem@gmail.com>
+Date:   Fri Dec 10 08:50:52 2021 +0530
+
+    Meeting details updated
+
+commit fc65a8ce3a5817c09216a7f2a8af4e4c35f2abe8
+Author: Sayyed Mohammad Aaseem <sayyed.aaseem@gmail.com>
+Date:   Fri Dec 10 08:40:51 2021 +0530
+
+    Update README.md
+
+commit 67148ad6f06593123ceb4e5b8485615e537e9a97
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Thu Dec 9 17:02:35 2021 -0800
+
+    Support for external infra clusters:
+    
+    - add InfraClusterSecretRef to KubevirtClusterSpec
+    - add example template
+    - add InfraCluster construct to incapsulate infra cluster client and context
+    - move cluster management resource cleanup logic to `reconcileDelete` func in controllers
+    - enhance logging
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit bf8fd23ba6f4c68da0c39c591ab2cc3a8460d19b
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Thu Dec 9 14:26:13 2021 +0100
+
+    Add e2e test lane
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit 13a7315a048ed88bd5495b99ff97b868cda0a525
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Thu Dec 9 14:08:16 2021 +0100
+
+    Build and test the code with github actions
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit a1686998739c30e01c7aac915363136d5cce6e34
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Dec 8 17:09:15 2021 -0500
+
+    Add unit test for detecting cloud-config user data type
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 64dda53a76239931198fba44696b3db3801e4004
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Dec 8 16:49:41 2021 -0500
+
+    Add unit tests for determining if boostrap detection is possible
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit fc8a193f538ed9a3252f4219641d64472e5847a2
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Wed Dec 8 14:47:27 2021 -0500
+
+    Ensure that bootstrap exec condition is set during functional test
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit b3d1a9afb150d4fb8d7dd601e8949ff692a489bb
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Dec 7 13:33:20 2021 -0500
+
+    Removes spec.Bootstrapped in favor of conditions
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 0da77153301d8875d6144d971ac5eac708e01164
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Mon Dec 6 17:42:03 2021 -0500
+
+    Update machine unit test to require ready condition for detecting is booted
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 05ca8dc438bfebe7f23c547e65829a825d6fda57
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Mon Dec 6 17:37:53 2021 -0500
+
+    Only inject ssh keys when cloud-config user data is used
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 6870e0a501db5597b9fa24660ce9decc4d614617
+Merge: 4967b39 623549a
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sun Dec 5 16:06:32 2021 -0800
+
+    Merge pull request #28 from sayantani11/Readme
+    
+    Improvement of Readme
+
+commit 4967b397a610b96cb2ce76af14a4396775f0fe38
+Merge: d9c840a bf15d9a
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Sun Dec 5 16:04:41 2021 -0800
+
+    Merge pull request #21 from nirarg/fix-node-patch
+    
+    Fix node patch and KubevirtMachine addresses change
+
+commit 623549ac9bafbca8fcd302567a8f251f65162b02
+Author: sayantani11 <ii.sayantani.ii@gmail.com>
+Date:   Sun Dec 5 20:09:50 2021 +0530
+
+    Improvement of Readme
+
+commit bf15d9a78e19115f08a071766403b6ee8db09849
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Wed Dec 1 12:55:40 2021 +0200
+
+    'make generate' changes
+
+commit fd66b90336d3965ea0d86ff6a39fe9502d9eb90b
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Sun Nov 28 15:01:24 2021 +0200
+
+    Add unit test for new patch Node function
+
+commit 3b649595a8133ab355c93cb6ce20351945fd35ec
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Thu Nov 25 13:13:43 2021 +0200
+
+    Move WorkloadClient creation to its own package
+    
+    This is done in order to make the code more testable
+    Also added mock to the new interface
+
+commit 9acb475e01dfd6603658d602aea2be5a8b1dfa83
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Wed Nov 24 16:08:21 2021 +0200
+
+    KubevirtMachine Addresses: Wait until IPAddress is valid in the vmi
+
+commit 3cbe30fe2428b3b0b56f0647b73127a4c17f6444
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Wed Nov 24 15:03:08 2021 +0200
+
+    Change patch node not to block kubevirtMachine status ready
+
+commit 4dbc3a3e3713dedff8c4960b2d17ce41919b6520
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Tue Nov 23 20:00:36 2021 +0200
+
+    KubevirtMachine Addresses: Add MachineInternalDNS Address
+
+commit d9c840ae569a8780f4bece5df9709055aea3dd03
+Merge: b910e6d 708cc28
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Dec 3 11:34:35 2021 -0800
+
+    Merge pull request #27 from rmohr/ssh-test-fix
+    
+    Fix an import error in the ssh unit tests
+
+commit b910e6d32259cb3a5ae9ad107a0b5a102359d537
+Merge: fade7c3 d868226
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Fri Dec 3 11:32:36 2021 -0800
+
+    Merge pull request #24 from davidvossel/backport-changeset-1
+    
+    kubevirt CI scripts
+
+commit 708cc28e5414a408ec6486035efac866a330ab99
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Fri Dec 3 10:02:20 2021 +0100
+
+    Remove non-existing make target from the "all" target
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit 9e90933e53f287d0e095da41c3f054c7f3f41abd
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Fri Dec 3 09:53:09 2021 +0100
+
+    Fix an import error in the ssh unit tests
+    
+    Switching the ssh tests to `kubevirt.io/api` to make the tests compile.
+    The kubevirt API is now coming from `kubevirt.io/api` instead of
+    `kubevirt.io/client-go`.
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit d868226fd6a981e32f825fb224f64faa834c09f8
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Thu Dec 2 09:43:51 2021 -0500
+
+    Add new kustomize layer for kubevirtci
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 7f426613ef6409afb8eb751cdca8923975d68d3d
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Mon Nov 29 15:39:22 2021 +0100
+
+    Add minimal funtest make target
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit fade7c3009853f7727a5e3f6e921ab83b700841f
+Merge: f8b1df8 ebfa9a0
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Nov 30 20:25:16 2021 -0800
+
+    Merge pull request #15 from dgovinndaraju12/unit-test-1
+    
+    Add unit test for cluster_node_ssh_keys.go
+
+commit ebfa9a0f93cb02a82a65eaea2cda392fde4083a9
+Author: Divya G <dgovindaraju@apple.com>
+Date:   Tue Nov 30 19:31:24 2021 -0800
+
+    picked the right commit
+
+commit 3a90904507aa8512294f0596164889fa250bdccc
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Tue Nov 30 12:25:27 2021 -0500
+
+    update go.sum
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit f37ec65cd8feeacf48315bcda3c743cfd690b861
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Mon Nov 22 17:12:18 2021 +0100
+
+    Add a basic verification script for e2e testing
+    
+    The script tests the most simple case of creating one cluster with one
+    worker and waits for the control-plane to become available.
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit faec1f5a9c537e28b6a68915adfc009defa87c61
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Nov 19 13:49:51 2021 -0500
+
+    Add kubevirtci refresh command for cycling capk controller
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 78efdae18dbc2e7845dcfa967229c7159896b924
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Nov 19 13:32:23 2021 -0500
+
+    Use kubevirtci quay.io image
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 1d5b73145e4537f01a078c72ae4a5dbbd17ced8d
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Nov 19 13:30:21 2021 -0500
+
+    make CRI runtime a variable for cluster template
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit af8060038eaef5b47e2d848eeffe1c8a0b2b9b81
+Author: David Vossel <davidvossel@gmail.com>
+Date:   Fri Nov 19 12:32:23 2021 -0500
+
+    Add custom clusterctl path to kubevirtci helper
+    
+    Signed-off-by: David Vossel <davidvossel@gmail.com>
+
+commit 3e3fc389165dce71485bbe61a0abab303e8f755c
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Fri Nov 19 18:59:44 2021 +0100
+
+    Make sync work on fresh installs
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit 599589b9124fa714337c132df1b6783d1696b742
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Fri Nov 19 14:11:44 2021 +0100
+
+    Add development environmet and e2e testing script
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit 6a2e8ab43a8fada35c890429ba1e8715ea908f61
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Fri Nov 19 14:10:58 2021 +0100
+
+    Run make generate to generate missing functions
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit 14d1ef5f3ecb5d78f7514f42156d5bdf13e99493
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Fri Nov 19 14:08:47 2021 +0100
+
+    Add a minimal Dockerfile
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit 98d36fc0c8d03cac3fe2e6422d71e9e98d0c73c2
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Fri Nov 19 14:05:29 2021 +0100
+
+    Slightly adjust the kustomize manifests
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit 1998fa05ff520137fad25db879cf64569ca7f0af
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Fri Nov 19 14:02:50 2021 +0100
+
+    Fix complaint about wrong import paths
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit f8b1df85744131efd017e5e07806e88e9ffd5297
+Merge: 8c217a7 b2c8cb2
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Nov 30 03:36:56 2021 -0800
+
+    Merge pull request #20 from rmohr/crypto-update-k8s-sig
+    
+    Update golang.org/x/crypto and switch from RSA to EC keys
+
+commit 8c217a7fb5f11d8cc09bd56e5b48aacbca452120
+Merge: 83c6938 d0c586c
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Tue Nov 30 00:34:56 2021 -0800
+
+    Merge pull request #17 from nirarg/kubevirt-client-modules
+    
+    Change Kubevirt client modules
+
+commit b2c8cb21080cb18b9a0c920564c657f2ca2df005
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Thu Nov 25 12:10:02 2021 +0100
+
+    Switch from RSA to EC keys for ssh connections
+    
+    EC keys are there for a very long time and some distros now start
+    disabling RSA by default.
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit f8883807e606fe45e61da1fb5bf5a6d244fda5e7
+Author: Roman Mohr <rmohr@redhat.com>
+Date:   Thu Nov 25 09:34:17 2021 +0100
+
+    Bump golang crypto library for better ssh protocol negotiations
+    
+    Fixes an issue where golang ssh can't connect to some ssh servers which
+    do not accept ssh-rsa preauthentication and make the connetions fail
+    with:
+    
+    ```
+    userauth_pubkey: key type ssh-rsa not in PubkeyAcceptedKeyTypes [preauth]
+    ```
+    
+    Signed-off-by: Roman Mohr <rmohr@redhat.com>
+
+commit d0c586cd52d0eecc2b5e37b72372fde6c452e354
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Thu Nov 18 11:47:22 2021 +0200
+
+    'go mod tidy' changes
+
+commit 2cc0ef879daece15cdedcbdcb9ca2a2c5a69137a
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Wed Nov 17 18:38:15 2021 +0200
+
+    kubevirt-client: Change use 'kubevirt.io/api' instead of 'kubevirt.io/client-go'
+
+commit b230e85e1e6afdd3940d820eed8e6813c84729a5
+Author: Divya G <dgovindaraju@apple.com>
+Date:   Tue Nov 16 09:52:41 2021 -0800
+
+    Add unit test for cluster_node_ssh_keys Signed-off-by: Divya Govindaraju <dgovindaraju@apple.com>
+
+commit 83c693883aa96d7e1822b8d25166cdc6ffa5fdae
+Merge: b259656 132eae7
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Nov 15 10:06:48 2021 -0800
+
+    Merge pull request #12 from nirarg/manager-namespace
+    
+    Add namespace option to manager start
+
+commit 132eae75488e85ba71ce8343e4cc1ebbb04bf0f0
+Author: Nir Argaman <nargaman@redhat.com>
+Date:   Wed Nov 10 16:59:49 2021 +0200
+
+    Add namespace option to manager start
+    
+    Limit the controller to watch for cluster-api objects only in specific namespace
+
+commit b2596562416cc548ce9775a203e42344fa5d46ec
+Merge: 76197b5 fba3b2e
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Oct 25 10:45:02 2021 -0700
+
+    Merge pull request #10 from cchengleo/MIGRATE/clusterctl-setting-metadata
+    
+    [Initial implementation migration] Add clusterctl-settings and metadata file
+
+commit 76197b5a716e992a52fbee77cf4a3a45da83469c
+Merge: 375fd68 6ebd07d
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Oct 25 10:43:01 2021 -0700
+
+    Merge pull request #9 from agradouski/init-commit-makefile
+    
+    [Initial implementation migration] Makefile
+
+commit 375fd6876a7e210f62b768ffa0fb895ec9caec5a
+Merge: f76ed1c 0ab3051
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Oct 25 10:41:02 2021 -0700
+
+    Merge pull request #8 from agradouski/init-commit-main
+    
+    [Initial implementation migration] main.go and modules
+
+commit f76ed1c9012dc5506975ca8d236510934f68acf5
+Merge: c8d39cc 0880ecb
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Oct 25 10:39:02 2021 -0700
+
+    Merge pull request #7 from agradouski/init-commit-controllers
+    
+    [Initial implementation migration] cluster and machine controllers
+
+commit c8d39cc66b4ef7f4b4f2803adb75436814e9d552
+Merge: 202a15b ec0ede9
+Author: Kubernetes Prow Robot <k8s-ci-robot@users.noreply.github.com>
+Date:   Mon Oct 25 10:37:05 2021 -0700
+
+    Merge pull request #6 from cchengleo/MIGRATE/utils-packages-machine-controller
+    
+    [Initial implementation migration] Add utils packages for machine controller
+
+commit 202a15be10227155de26feea80c48b179f8caa25
+Author: Cheng Cheng <ccheng@ccheng.us>
+Date:   Mon Oct 25 10:36:27 2021 -0700
+
+    The initial code migration for cluster-api-provider-kubevirt by Apple Inc. (#5)
+    
+    - Add utils packages (and unit tests) for cluster controller
+    
+    Signed-off-by: Cheng Cheng <chengcheng@apple.com>
+
+commit 08c87ea9e2c23172e5ad9014f1fd25993ccc4b62
+Author: Alexander Gradouski <73259059+agradouski@users.noreply.github.com>
+Date:   Mon Oct 25 10:32:22 2021 -0700
+
+    The initial code migration for cluster-api-provider-kubevirt by Apple Inc. (#4)
+    
+    - configs: crd, rbac, etc.
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit 311f015a6547bec71e29a8adb8daac77a65d3197
+Author: Cheng Cheng <ccheng@ccheng.us>
+Date:   Mon Oct 25 10:24:22 2021 -0700
+
+    The initial code migration for cluster-api-provider-kubevirt by Apple Inc. (#3)
+    
+    - API definition
+    - cluster definition YAML temple
+    
+    Signed-off-by: Cheng Cheng <chengcheng@apple>
+
+commit 0ab30515b3df49681bd2b65b38efd3e96f1fc39f
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Mon Oct 18 18:16:39 2021 -0700
+
+    The initial code migration for cluster-api-provider-kubevirt by Apple Inc.
+    
+    - module and dependencies
+    - main.go
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit 0880ecbc9d6bc9ad8b92a7f1f0730b91212487f4
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Mon Oct 18 18:08:15 2021 -0700
+
+    The initial code migration for cluster-api-provider-kubevirt by Apple Inc.
+    
+    - kubevirt cluster and machine controllers
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit 6ebd07dba2ec0d5d3c76f2a6cde963fd81d68776
+Author: Alex Gradouski <agradouski@gmail.com>
+Date:   Mon Oct 18 18:45:51 2021 -0700
+
+    The initial code migration for cluster-api-provider-kubevirt by Apple Inc.
+    
+    - Makefile
+    - Makefile dependencies
+    
+    Signed-off-by: Alex Gradouski <agradouski@apple.com>
+
+commit fba3b2e25eea87cf5066d256aa53407f94477ce5
+Author: Cheng Cheng <ccheng@ccheng.us>
+Date:   Fri Oct 15 16:46:26 2021 -0700
+
+    The initial code migration for cluster-api-provider-kubevirt by Apple Inc.
+    
+    - Add clusterctl-settings
+    - Add metadata for cluster-api contract version
+    
+    Signed-off-by: Cheng Cheng <chengcheng@apple.com>
+
+commit ec0ede9805ab56f059d2893d24a20bf4d0ff3c14
+Author: Cheng Cheng <ccheng@ccheng.us>
+Date:   Thu Oct 14 21:52:15 2021 -0700
+
+    The initial code migration for cluster-api-provider-kubevirt by Apple Inc.
+    
+    - Add utils packages (and unit tests) for machine controller
+    
+    Signed-off-by: Cheng Cheng <chengcheng@apple.com>
+
+commit d6389182d7c06da9b4a9c01a6c3cfb27eae3de5c
+Author: Cheng Cheng <ccheng@ccheng.us>
+Date:   Mon Oct 18 17:47:22 2021 -0700
+
+    Add .github templates (#2)
+    
+    - Add PR template
+    - ADD ISSUE templates
+    
+    Signed-off-by: Cheng Cheng <chengcheng@apple.com>
+
+commit 8521df9b21568c7b834f59b4d688a697c285e953
+Author: Bob Killen <bobkillen@google.com>
+Date:   Fri Sep 24 19:17:51 2021 -0400
+
+    Update OWNERS, OWNERS_ALIASES and SECURITY_CONTACTS
+
+commit db321f7fb629f19e3c917060183dcab53880ccf4
+Author: Bob Killen <killen.bob@gmail.com>
+Date:   Fri Sep 24 19:08:23 2021 -0400
+
+    Initial commit

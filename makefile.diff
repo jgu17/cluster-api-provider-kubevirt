@@ -1,0 +1,30 @@
+diff --git a/Makefile b/Makefile
+index 03a18e8..73522cc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -220,13 +220,13 @@ docker-pull-prerequisites:
+ 
+ .PHONY: docker-build
+ docker-build: docker-pull-prerequisites ## Build the docker image for controller-manager
+-	DOCKER_BUILDKIT=1 docker build --build-arg goproxy="$(GOPROXY)" --build-arg ARCH=$(ARCH) . -t $(CONTROLLER_IMG)-$(ARCH):$(TAG) --file Dockerfile
+-	MANIFEST_IMG=$(CONTROLLER_IMG)-$(ARCH) MANIFEST_TAG=$(TAG) $(MAKE) set-manifest-image
++	DOCKER_BUILDKIT=1 docker build --build-arg goproxy="$(GOPROXY)" --build-arg ARCH=$(ARCH) . -t $(CONTROLLER_IMG):$(TAG) --file Dockerfile
++	MANIFEST_IMG=$(CONTROLLER_IMG) MANIFEST_TAG=$(TAG) $(MAKE) set-manifest-image
+ 	$(MAKE) set-manifest-pull-policy
+ 
+ .PHONY: docker-push
+ docker-push: ## Push the docker image
+-	docker push $(CONTROLLER_IMG)-$(ARCH):$(TAG)
++	docker push $(CONTROLLER_IMG):$(TAG)
+ 
+ ## --------------------------------------
+ ## Docker — All ARCH
+@@ -249,7 +249,7 @@ docker-push-%:
+ docker-push-manifest: ## Push the fat manifest docker image.
+ 	## Minimum docker version 18.06.0 is required for creating and pushing manifest images.
+ 	docker manifest create --amend $(CONTROLLER_IMG):$(TAG) $(shell echo $(ALL_ARCH) | sed -e "s~[^ ]*~$(CONTROLLER_IMG)\-&:$(TAG)~g")
+-	@for arch in $(ALL_ARCH); do docker manifest annotate --arch $${arch} ${CONTROLLER_IMG}:${TAG} ${CONTROLLER_IMG}-$${arch}:${TAG}; done
++	@for arch in $(ALL_ARCH); do docker manifest annotate --arch $${arch} ${CONTROLLER_IMG}:${TAG} ${CONTROLLER_IMG}:${TAG}; done
+ 	docker manifest push --purge $(CONTROLLER_IMG):$(TAG)
+ 	MANIFEST_IMG=$(CONTROLLER_IMG) MANIFEST_TAG=$(TAG) $(MAKE) set-manifest-image
+ 	$(MAKE) set-manifest-pull-policy

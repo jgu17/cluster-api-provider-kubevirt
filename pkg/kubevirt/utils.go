@@ -163,10 +163,6 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
 				UserDataSecretRef: &corev1.LocalObjectReference{
 					Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-userdata",
 				},
-				// TODO gujames remove
-				// NetworkDataSecretRef: &corev1.LocalObjectReference{
-				// 	Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-networkdata",
-				// },
 			},
 		},
 	}
