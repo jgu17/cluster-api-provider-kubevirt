@@ -32,8 +32,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-const KernelArgsVolumeLabel = "kernelarg-cfg"
-const KernelArgsSecretKey = "kernelarg.cfg"
+const KernelArgsVolumeLabel = "kernelargs-cfg"
+const KernelArgsSecretKey = "kernelargs.cfg"
 const KernelArgsVolumeName = "kernelargsvolume"
 const DiskDeviceTypeVirtIO = "virtio"
 
