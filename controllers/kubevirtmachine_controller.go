@@ -241,13 +241,11 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
 	}
 
-	ctx.Logger.Info("Reconciling bootstrap secret")
 	if err := r.reconcileKubevirtBootstrapSecret(ctx, infraClusterClient, vmNamespace, clusterNodeSshKeys); err != nil {
 		conditions.MarkFalse(ctx.KubevirtMachine, infrav1.VMProvisionedCondition, infrav1.WaitingForBootstrapDataReason, clusterv1.ConditionSeverityInfo, "")
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to fetch kubevirt bootstrap secret")
 	}
 
-	ctx.Logger.Info("Reconciling kernel args secret")
 	if _, err := r.reconcileKernelArgsSecret(ctx, infraClusterClient, infraClusterNamespace); err != nil {
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to reconcile kernel args secret")
 	}
@@ -278,6 +276,7 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 		return ctrl.Result{}, errors.Wrapf(err, "failed checking VM for terminal state")
 	}
 	if isTerminal {
+		ctx.Logger.Info("Mark kubevirt machine failure", "reason", terminalReason)
 		failureErr := capierrors.UpdateMachineError
 		ctx.KubevirtMachine.Status.FailureReason = &failureErr
 		ctx.KubevirtMachine.Status.FailureMessage = &terminalReason
@@ -297,6 +296,7 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 	// Checks to see if a VM's active VMI is ready or not
 	if externalMachine.IsReady() {
 		// Mark VMProvisionedCondition to indicate that the VM has successfully started
+		ctx.Logger.Info("Kubevirt vm is ready")
 		conditions.MarkTrue(ctx.KubevirtMachine, infrav1.VMProvisionedCondition)
 	} else {
 		reason, message := externalMachine.GetVMNotReadyReason()
@@ -330,6 +330,7 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 		return ctrl.Result{RequeueAfter: retryDuration}, errors.Wrap(err, "failed to drain node")
 	}
 	if retryDuration > 0 {
+		ctx.Info("retry for drain node", "duration", retryDuration)
 		return ctrl.Result{RequeueAfter: retryDuration}, nil
 	}
 
@@ -377,8 +378,10 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 
 	// Ready should reflect if the VMI is ready or not
 	if externalMachine.IsReady() {
+		ctx.Info("Set kubevirt machine status ready true")
 		ctx.KubevirtMachine.Status.Ready = true
 	} else {
+		ctx.Info("Set kubevirt machine status ready false")
 		ctx.KubevirtMachine.Status.Ready = false
 	}
 
